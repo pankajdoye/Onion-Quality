@@ -1,0 +1,25 @@
+{
+  "project_name": "OnionGrade AI Threshold Standards",
+  "disclaimer": "Project-defined transparent grading rules based on measured physical & defect parameters. Not official government regulations.",
+  "version": "1.0",
+  "grade_a": {
+    "minimum_quality_score": 85,
+    "maximum_rotten_percentage": 5,
+    "maximum_sprouted_percentage": 5,
+    "maximum_damaged_percentage": 10,
+    "minimum_diameter_mm": 60,
+    "description": "Export & Premium Retail Quality"
+  },
+  "grade_b": {
+    "minimum_quality_score": 65,
+    "maximum_rotten_percentage": 10,
+    "maximum_sprouted_percentage": 12,
+    "maximum_damaged_percentage": 20,
+    "minimum_diameter_mm": 45,
+    "description": "Domestic APMC Standard Market Quality"
+  },
+  "urs": {
+    "maximum_quality_score": 64,
+    "description": "Un-graded / Reject / Processing Level Quality"
+  }
+}

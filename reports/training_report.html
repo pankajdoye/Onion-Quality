@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Onion AI - Model Training & Evaluation Report</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 30px; background-color: #f8fafc; color: #1e293b; }
+        .header { background: #0f172a; color: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .metric-value { font-size: 32px; font-weight: bold; color: #0284c7; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f1f5f9; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧅 Smart Onion AI - Model Training & Evaluation Report</h1>
+        <p>End-to-End Multi-Stage AI Pipeline Performance on Unseen Test Split</p>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Stage 1: Onion Validator (Binary Classifier)</h3>
+            <div class="metric-value">83.8%</div>
+            <p><strong>Accuracy:</strong> 0.8380</p>
+            <p><strong>Precision:</strong> 1.0000</p>
+            <p><strong>Recall:</strong> 0.7659</p>
+            <p><strong>F1 Score:</strong> 0.8674</p>
+            <p><strong>False Positive Rate:</strong> 0.0000</p>
+        </div>
+
+        <div class="card">
+            <h3>Stage 2: Onion Quality Classifier</h3>
+            <div class="metric-value">96.3%</div>
+            <p><strong>Accuracy:</strong> 0.9631</p>
+            <p><strong>Macro F1:</strong> 0.9629</p>
+            <p><strong>Macro Precision:</strong> 0.9622</p>
+            <p><strong>Macro Recall:</strong> 0.9649</p>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+        <h3>Error Analysis Breakdown</h3>
+        <p><strong>False Positives (Non-onion predicted as onion):</strong> 0</p>
+        <p><strong>False Negatives (Onion predicted as non-onion):</strong> 0</p>
+    </div>
+</body>
+</html>

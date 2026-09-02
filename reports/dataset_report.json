@@ -1,0 +1,18 @@
+{
+  "total_images": 14413,
+  "by_dataset": {
+    "onion_bulb_leaf": 6992,
+    "vegqual": 7421
+  },
+  "by_class": {
+    "bulb_healthy": 1684,
+    "leaf_healthy": 1701,
+    "leaf_unhealthy": 3607,
+    "non_onion": 4428,
+    "onion_defective": 2531,
+    "onion_fresh": 462
+  },
+  "missing_labels": 0,
+  "corrupted_files": 0,
+  "average_dimensions": "453x453"
+}

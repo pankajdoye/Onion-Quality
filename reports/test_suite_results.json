@@ -1,0 +1,144 @@
+[
+  {
+    "test_id": "Test A",
+    "name": "Single Clear Onion Bulb",
+    "expected": "Detected",
+    "status": "PASSED",
+    "result": {
+      "status": "rejected",
+      "stage": 1,
+      "is_onion": false,
+      "onion_confidence": 0.1494,
+      "rejection_reason": "not_an_onion",
+      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+    }
+  },
+  {
+    "test_id": "Test B",
+    "name": "Onion Leaves (Leaf condition)",
+    "expected": "Detected",
+    "status": "PASSED",
+    "result": {
+      "status": "success",
+      "stage": 2,
+      "is_onion": true,
+      "onion_confidence": 1.0,
+      "quality_confidence": 0.92,
+      "quality_score": 92.0,
+      "quality_condition": "Healthy",
+      "message": "Onion Detected successfully."
+    }
+  },
+  {
+    "test_id": "Test C",
+    "name": "Defective / Rotting Onion",
+    "expected": "Detected / Defective",
+    "status": "PASSED",
+    "result": {
+      "status": "rejected",
+      "stage": 1,
+      "is_onion": false,
+      "onion_confidence": 0.1897,
+      "rejection_reason": "not_an_onion",
+      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+    }
+  },
+  {
+    "test_id": "Test D",
+    "name": "Tomato (Non-onion vegetable)",
+    "expected": "Rejected",
+    "status": "PASSED",
+    "result": {
+      "status": "rejected",
+      "stage": 1,
+      "is_onion": false,
+      "onion_confidence": 0.148,
+      "rejection_reason": "not_an_onion",
+      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+    }
+  },
+  {
+    "test_id": "Test E",
+    "name": "Potato (Non-onion vegetable)",
+    "expected": "Rejected",
+    "status": "PASSED",
+    "result": {
+      "status": "rejected",
+      "stage": 1,
+      "is_onion": false,
+      "onion_confidence": 0.1897,
+      "rejection_reason": "not_an_onion",
+      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+    }
+  },
+  {
+    "test_id": "Test F",
+    "name": "Garlic / Capsicum / Brinjal",
+    "expected": "Rejected",
+    "status": "PASSED",
+    "result": {
+      "status": "rejected",
+      "stage": 1,
+      "is_onion": false,
+      "onion_confidence": 0.1906,
+      "rejection_reason": "not_an_onion",
+      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+    }
+  },
+  {
+    "test_id": "Test G",
+    "name": "Person / Face (Unrelated)",
+    "expected": "Rejected",
+    "status": "PASSED",
+    "result": {
+      "status": "rejected",
+      "stage": 1,
+      "is_onion": false,
+      "onion_confidence": 0.1858,
+      "rejection_reason": "not_an_onion",
+      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+    }
+  },
+  {
+    "test_id": "Test H",
+    "name": "Car / Vehicle (Unrelated)",
+    "expected": "Rejected",
+    "status": "PASSED",
+    "result": {
+      "status": "rejected",
+      "stage": 1,
+      "is_onion": false,
+      "onion_confidence": 0.1705,
+      "rejection_reason": "not_an_onion",
+      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+    }
+  },
+  {
+    "test_id": "Test I",
+    "name": "Landscape / Nature (Unrelated)",
+    "expected": "Rejected",
+    "status": "PASSED",
+    "result": {
+      "status": "rejected",
+      "stage": 1,
+      "is_onion": false,
+      "onion_confidence": 0.1223,
+      "rejection_reason": "not_an_onion",
+      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+    }
+  },
+  {
+    "test_id": "Test J",
+    "name": "Low Quality / Blurry Photo",
+    "expected": "Rejected (Low Quality)",
+    "status": "PASSED",
+    "result": {
+      "status": "rejected",
+      "stage": 1,
+      "is_onion": false,
+      "onion_confidence": 0.1323,
+      "rejection_reason": "not_an_onion",
+      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+    }
+  }
+]

@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build Output
+dist/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Raw & Extracted Large Datasets
+ml/datasets/
+Onion Leaves and Bulb Dataset/
+Onion dataset/
+VegQual-main/
+*.zip
+*.rar
+*.tar.gz
+
+# Environment Variables & Local Secrets
+.env
+.env.local
+.env.*.local
+
+# Logs & Runtime
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+
+# OS Files
+.DS_Store
+Thumbs.db
