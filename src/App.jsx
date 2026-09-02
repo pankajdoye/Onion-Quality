@@ -77,12 +77,22 @@ export default function App() {
 
             {activeTab === 'help' && (
               <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-[#1F2933] rounded-3xl shadow-md border border-slate-200 dark:border-[#374151] space-y-4">
-                <h2 className="text-2xl font-black text-[#263238] dark:text-[#F5F7FA]">Help & Support</h2>
-                <p className="text-sm text-[#607D8B] dark:text-[#B8C2CC]">
-                  Welcome to AI Onion Quality Grading Support. For assistance with camera image capture, quality grading standards, or APMC mandi price estimation, please contact our agricultural support desk.
+                <h2 className="text-2xl font-black text-[#263238] dark:text-[#F5F7FA]">
+                  {lang === 'mr' ? 'मदत आणि सपोर्ट' : lang === 'hi' ? 'सहायता एवं सपोर्ट' : 'Help & Support'}
+                </h2>
+                <p className="text-sm text-[#607D8B] dark:text-[#B8C2CC] leading-relaxed font-medium">
+                  {lang === 'mr'
+                    ? 'कांदा गुणवत्ता तपासणी, कॅमेरा फोटो, साठवणूक मार्गदर्शक किंवा बाजार समिती भावाबाबत कोणत्याही मदतीसाठी आमच्या शेतकरी सहाय्य कक्षाशी संपर्क साधा.'
+                    : lang === 'hi'
+                    ? 'प्याज गुणवत्ता जांच, कैमरा फोटो, भंडारण सलाह या मंडी भाव से संबंधित किसी भी सहायता के लिए हमारे किसान सहायता केंद्र से संपर्क करें।'
+                    : 'Welcome to AI Onion Quality Grading Support. For assistance with camera image capture, quality grading standards, or APMC mandi price estimation, please contact our agricultural support desk.'}
                 </p>
                 <div className="p-4 bg-emerald-50 dark:bg-[#18212B] rounded-2xl border border-emerald-200 dark:border-[#374151] text-xs font-bold text-emerald-900 dark:text-[#66BB6A]">
-                  📞 Toll-Free Kisan Support Hotline: 1800-123-ONION (66466)
+                  {lang === 'mr' 
+                    ? '📞 टोल-फ्री किसान सपोर्ट हेल्पलाइन: १८००-१२३-ONION (६६४६६)'
+                    : lang === 'hi'
+                    ? '📞 टोल-फ्री किसान सहायता हेल्पलाइन: 1800-123-ONION (66466)'
+                    : '📞 Toll-Free Kisan Support Hotline: 1800-123-ONION (66466)'}
                 </div>
               </div>
             )}
@@ -91,7 +101,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <Footer setActiveTab={setActiveTab} />
+      <Footer setActiveTab={setActiveTab} lang={lang} />
 
       {/* Bottom Navigation Bar */}
       {mode === 'farmer' && (

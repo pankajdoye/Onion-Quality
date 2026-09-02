@@ -23,7 +23,7 @@ export async function analyzeOnionSample({ imageFile, imageSrc, sampleId, batchI
             rejection_reason: 'not_an_onion',
             is_onion: false,
             onion_confidence: 0.12,
-            message: "🧅 Onion Not Detected. Quality score cannot be calculated for non-onion images."
+            message: "Please capture a clear photo of the onion."
           }
         });
       }, 1000);
@@ -152,3 +152,6 @@ export async function analyzeOnionSample({ imageFile, imageSrc, sampleId, batchI
     }, 1500);
   });
 }
+
+export const analyzeOnionQuality = analyzeOnionSample;
+

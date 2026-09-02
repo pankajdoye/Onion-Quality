@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { X, Download, Globe, FileText, Check, Loader2 } from 'lucide-react';
+import { X, Download, FileText, Check, Loader2 } from 'lucide-react';
 import { generateMultilingualPdfReport } from '../../utils/pdfGenerator';
 import { SMART_I18N } from '../../utils/i18n_smart';
 
 export default function ReportDownloadModal({ isOpen, onClose, resultData, imageSrc, currentLang = 'en' }) {
-  const [selectedLang, setSelectedLang] = useState(currentLang);
+  // Use the saved report's language if available, otherwise current UI language
+  const initialLang = resultData?.lang || currentLang;
+  const [selectedLang, setSelectedLang] = useState(initialLang);
   const [isGenerating, setIsGenerating] = useState(false);
   const t = SMART_I18N[currentLang] || SMART_I18N.en;
 
@@ -13,15 +15,16 @@ export default function ReportDownloadModal({ isOpen, onClose, resultData, image
   const languages = [
     { code: 'en', flag: '🇬🇧', label: 'English', subtitle: 'Standard English Report' },
     { code: 'hi', flag: '🇮🇳', label: 'हिंदी (Hindi)', subtitle: 'हिंदी गुणवत्ता रिपोर्ट' },
-    { code: 'mr', flag: '🇮🇳', label: 'मराठी (Marathi)', subtitle: 'मराठी कांदा अहवाल' }
+    { code: 'mr', flag: '🇮🇳', label: 'मराठी (Marathi)', subtitle: 'मराठी कांदा गुणवत्ता अहवाल' }
   ];
 
   const handleDownload = async () => {
     setIsGenerating(true);
     await generateMultilingualPdfReport({
       resultData,
-      imageSrc,
-      lang: selectedLang
+      imageSrc: imageSrc || resultData?.imageSrc,
+      lang: selectedLang,
+      reportId: resultData?.id
     });
     setIsGenerating(false);
     onClose();
@@ -49,7 +52,7 @@ export default function ReportDownloadModal({ isOpen, onClose, resultData, image
                 {t.downloadReportBtn || "Download Quality Report"}
               </h3>
               <p className="text-xs text-[#607D8B] dark:text-[#B8C2CC] font-medium">
-                Select your preferred report language
+                {t.selectPdfLanguage || "Select your preferred report language"}
               </p>
             </div>
           </div>
@@ -107,7 +110,7 @@ export default function ReportDownloadModal({ isOpen, onClose, resultData, image
             onClick={onClose}
             className="flex-1 py-3.5 rounded-2xl border border-slate-300 dark:border-[#374151] text-[#263238] dark:text-[#F5F7FA] font-bold text-xs hover:bg-slate-100 dark:hover:bg-[#202A35] transition-all"
           >
-            Cancel
+            {currentLang === 'mr' ? 'रद्द करा' : currentLang === 'hi' ? 'रद्द करें' : 'Cancel'}
           </button>
 
           <button
@@ -118,12 +121,12 @@ export default function ReportDownloadModal({ isOpen, onClose, resultData, image
             {isGenerating ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Generating PDF...</span>
+                <span>{currentLang === 'mr' ? 'पीडीएफ तयार होत आहे...' : currentLang === 'hi' ? 'पीडीएफ बन रही है...' : 'Generating PDF...'}</span>
               </>
             ) : (
               <>
                 <FileText className="w-4 h-4" />
-                <span>Download PDF ↓</span>
+                <span>{t.downloadReportBtn || "Download PDF ↓"}</span>
               </>
             )}
           </button>

@@ -24,10 +24,42 @@ export default function TopResultCard({ resultData, lang = 'en' }) {
   };
 
   const textToVoice = lang === 'mr'
-    ? `तुमचा तपासणी निकाल चांगला आहे. ग्रेड ए बहत्तर टक्के आहे. अंदाजे बाजारभाव २६०० रुपये प्रति क्विंटल आहे.`
+    ? `तुमचा तपासणी निकाल चांगला आहे. ग्रेड ए ${data.grade_a} टक्के आहे. अंदाजे बाजारभाव ${data.expected_price} आहे.`
     : lang === 'hi'
-    ? `आपका जांच परिणाम अच्छा है। ग्रेड ए बहत्तर प्रतिशत है। अनुमानित मंडी भाव दो हजार छह सौ रुपये प्रति क्विंटल है।`
-    : `Your result is Good Quality. Grade A is 72 percent. Expected price is 2,600 rupees per quintal. Best market is Lasalgaon.`;
+    ? `आपका जांच परिणाम अच्छा है। ग्रेड ए ${data.grade_a} प्रतिशत है। अनुमानित मंडी भाव ${data.expected_price} है।`
+    : `Your result is Good Quality. Grade A is ${data.grade_a} percent. Expected price is ${data.expected_price}. Best market is ${data.best_market}.`;
+
+  const labels = {
+    mr: {
+      resultBadge: "तपासणी निकाल",
+      qualityStatus: "🟢 चांगला दर्जा (उत्कृष्ट प्रत)",
+      score: "गुण",
+      apmcEstimate: "अधिकृत APMC अंदाज",
+      highestReturn: "सर्वोत्तम निव्वळ नफा",
+      recommendation: "सल्ला व शिफारस",
+      recommendedToSell: "🟢 विक्रीस योग्य वेळ"
+    },
+    hi: {
+      resultBadge: "जांच परिणाम",
+      qualityStatus: "🟢 अच्छी गुणवत्ता (उत्कृष्ट ग्रेड)",
+      score: "स्कोर",
+      apmcEstimate: "आधिकारिक मंडी अनुमान",
+      highestReturn: "सर्वोत्तम शुद्ध आय",
+      recommendation: "सलाह एवं सिफारिश",
+      recommendedToSell: "🟢 बिक्री हेतु उपयुक्त समय"
+    },
+    en: {
+      resultBadge: "Analysis Result",
+      qualityStatus: "🟢 Good Quality",
+      score: "Score",
+      apmcEstimate: "Official APMC Estimate",
+      highestReturn: "Highest Net Return",
+      recommendation: "Recommendation",
+      recommendedToSell: "🟢 Recommended to Sell"
+    }
+  };
+
+  const l = labels[lang] || labels.en;
 
   return (
     <div className="bg-white dark:bg-[#1F2933] rounded-3xl border border-slate-200 dark:border-[#374151] p-6 shadow-sm space-y-6 transition-colors">
@@ -36,10 +68,10 @@ export default function TopResultCard({ resultData, lang = 'en' }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-[#374151] pb-4">
         <div>
           <span className="text-xs font-black uppercase tracking-wider text-emerald-800 dark:text-[#66BB6A] bg-emerald-100 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-300 dark:border-emerald-800">
-            {t.yourResultTitle || "Analysis Result"}
+            {l.resultBadge}
           </span>
           <h2 className="text-3xl font-black text-[#263238] dark:text-[#F5F7FA] mt-2 flex items-center gap-2">
-            <span>🟢 {t.goodQuality || "Good Quality"}</span>
+            <span>{l.qualityStatus}</span>
           </h2>
         </div>
 
@@ -53,14 +85,14 @@ export default function TopResultCard({ resultData, lang = 'en' }) {
         <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-center">
           <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 uppercase block">{t.gradeA || "Grade A"}</span>
           <div className="text-4xl font-black text-emerald-700 dark:text-[#66BB6A] mt-1">{data.grade_a}%</div>
-          <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 block mt-1">Score: {data.quality_score}/100</span>
+          <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 block mt-1">{l.score}: {data.quality_score}/100</span>
         </div>
 
         {/* Expected Price */}
         <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-center">
           <span className="text-[11px] font-bold text-purple-900 dark:text-purple-300 uppercase block">{t.expectedPrice || "Market Price"}</span>
           <div className="text-2xl font-black text-purple-800 dark:text-purple-300 mt-2">{data.expected_price}</div>
-          <span className="text-[11px] text-purple-700 dark:text-purple-400 font-semibold block mt-1">Official APMC Estimate</span>
+          <span className="text-[11px] text-purple-700 dark:text-purple-400 font-semibold block mt-1">{l.apmcEstimate}</span>
         </div>
 
         {/* Best Market */}
@@ -70,17 +102,17 @@ export default function TopResultCard({ resultData, lang = 'en' }) {
             <MapPin className="w-4 h-4 text-amber-600 dark:text-[#F59E0B]" />
             {data.best_market}
           </div>
-          <span className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold block mt-1">Highest Net Return</span>
+          <span className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold block mt-1">{l.highestReturn}</span>
         </div>
 
         {/* Selling Advice */}
         <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-center">
-          <span className="text-[11px] font-bold text-blue-900 dark:text-blue-300 uppercase block">Recommendation</span>
+          <span className="text-[11px] font-bold text-blue-900 dark:text-blue-300 uppercase block">{l.recommendation}</span>
           <div className="text-sm font-black text-blue-800 dark:text-blue-300 mt-2 flex items-center justify-center gap-1">
             <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             {data.selling_advice}
           </div>
-          <span className="text-[11px] text-blue-700 dark:text-blue-400 font-semibold block mt-1">🟢 Recommended to Sell</span>
+          <span className="text-[11px] text-blue-700 dark:text-blue-400 font-semibold block mt-1">{l.recommendedToSell}</span>
         </div>
 
       </div>

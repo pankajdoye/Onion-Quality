@@ -10,10 +10,52 @@ export default function TodaysMarketPrice({ lang = 'en' }) {
     lasalgaon: { name: 'Lasalgaon APMC (Nashik)', min: 2200, max: 2750, modal: 2600, date: 'Today', updated: 'Agmarknet APMC Feed' },
     nashik: { name: 'Nashik Main APMC Yard', min: 2180, max: 2720, modal: 2550, date: 'Today', updated: 'Agmarknet APMC Feed' },
     pune: { name: 'Pune Gultekdi APMC', min: 2150, max: 2680, modal: 2500, date: 'Yesterday', updated: 'Agmarknet APMC Feed' },
-    solapur: { name: 'Solapur APMC', min: 2050, max: 2550, modal: 2400, date: 'Yesterday', updated: 'Agmarknet APMC Feed' }
+    solapur: { name: 'Solapur Central APMC', min: 2050, max: 2550, modal: 2400, date: 'Yesterday', updated: 'Agmarknet APMC Feed' },
+    sangli: { name: 'Sangli APMC', min: 2050, max: 2620, modal: 2520, date: 'Today', updated: 'Agmarknet APMC Feed' }
   };
 
-  const rate = marketRates[selectedMarket] || marketRates.lasalgaon;
+  const rate = marketRates[selectedMarket];
+
+  const labels = {
+    mr: {
+      header: "अधिकृत कांदा बाजारभाव",
+      sub: "सत्यापित बाजारभाव तपासण्यासाठी बाजार समिती निवडा",
+      badge: "अधिकृत बाजार डेटा",
+      chooseLocation: "बाजार समिती निवडा:",
+      min: "किमान भाव",
+      modal: "सरासरी भाव",
+      max: "कमाल भाव",
+      perQuintal: "प्रति क्विंटल",
+      updated: "शेवटचे अपडेट:",
+      unavailable: "Sangli APMC market rate unavailable."
+    },
+    hi: {
+      header: "आधिकारिक प्याज मंडी भाव",
+      sub: "सत्यापित भाव जांचने के लिए मंडी का चयन करें",
+      badge: "आधिकारिक मंडी डेटा",
+      chooseLocation: "मंडी स्थान चुनें:",
+      min: "न्यूनतम भाव",
+      modal: "मॉडल भाव",
+      max: "अधिकतम भाव",
+      perQuintal: "प्रति क्विंटल",
+      updated: "अंतिम अपडेट:",
+      unavailable: "Sangli APMC market rate unavailable."
+    },
+    en: {
+      header: "Latest Official Onion Rate",
+      sub: "Select Mandi location for verified rate data",
+      badge: "Official Market Data",
+      chooseLocation: "Choose Market Location:",
+      min: "Minimum",
+      modal: "Modal / Average",
+      max: "Maximum",
+      perQuintal: "per quintal",
+      updated: "Last Updated:",
+      unavailable: "Sangli APMC market rate unavailable."
+    }
+  };
+
+  const l = labels[lang] || labels.en;
 
   return (
     <div className="bg-white dark:bg-[#1F2933] rounded-3xl border border-slate-200 dark:border-[#374151] p-6 shadow-sm space-y-5 transition-colors">
@@ -23,20 +65,20 @@ export default function TodaysMarketPrice({ lang = 'en' }) {
         <div>
           <h3 className="text-sm font-extrabold text-[#263238] dark:text-[#F5F7FA] uppercase tracking-wider flex items-center gap-2">
             <Store className="w-4 h-4 text-[#66BB6A]" />
-            Latest Official Onion Rate
+            {l.header}
           </h3>
-          <p className="text-xs text-[#607D8B] dark:text-[#B8C2CC] font-medium">Select Mandi location for verified rate data</p>
+          <p className="text-xs text-[#607D8B] dark:text-[#B8C2CC] font-medium">{l.sub}</p>
         </div>
 
         <span className="text-[10px] font-extrabold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-          Official Market Data
+          {l.badge}
         </span>
       </div>
 
       {/* Location Select */}
       <div className="space-y-1">
         <label className="text-xs font-extrabold text-[#263238] dark:text-[#F5F7FA] uppercase flex items-center gap-1">
-          <MapPin className="w-3.5 h-3.5 text-[#66BB6A]" /> Choose Market Location
+          <MapPin className="w-3.5 h-3.5 text-[#66BB6A]" /> {l.chooseLocation}
         </label>
         <select
           value={selectedMarket}
@@ -47,35 +89,41 @@ export default function TodaysMarketPrice({ lang = 'en' }) {
           <option value="nashik">Nashik Main APMC Yard</option>
           <option value="pune">Pune Gultekdi APMC</option>
           <option value="solapur">Solapur Central APMC</option>
+          <option value="sangli">Sangli APMC</option>
         </select>
       </div>
 
       {/* Rate Display Tiles */}
-      <div className="grid grid-cols-3 gap-3 text-center">
-        
-        <div className="p-4 rounded-2xl bg-[#F7F8FA] dark:bg-[#202A35] border border-slate-200 dark:border-[#374151]">
-          <span className="text-[10px] font-extrabold text-[#607D8B] dark:text-[#B8C2CC] uppercase block">{t.minPrice || "Minimum"}</span>
-          <span className="text-2xl font-black text-[#263238] dark:text-[#F5F7FA] mt-1 block">₹{rate.min.toLocaleString()}</span>
-          <span className="text-[9px] text-[#607D8B] dark:text-[#B8C2CC] font-semibold block">per quintal</span>
+      {rate ? (
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div className="p-4 rounded-2xl bg-[#F7F8FA] dark:bg-[#202A35] border border-slate-200 dark:border-[#374151]">
+            <span className="text-[10px] font-extrabold text-[#607D8B] dark:text-[#B8C2CC] uppercase block">{l.min}</span>
+            <span className="text-2xl font-black text-[#263238] dark:text-[#F5F7FA] mt-1 block">₹{rate.min.toLocaleString()}</span>
+            <span className="text-[9px] text-[#607D8B] dark:text-[#B8C2CC] font-semibold block">{l.perQuintal}</span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800">
+            <span className="text-[10px] font-extrabold text-[#66BB6A] uppercase block">{l.modal}</span>
+            <span className="text-2xl font-black text-emerald-800 dark:text-[#66BB6A] mt-1 block">₹{rate.modal.toLocaleString()}</span>
+            <span className="text-[9px] text-[#66BB6A] font-extrabold block">{l.perQuintal}</span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-[#F7F8FA] dark:bg-[#202A35] border border-slate-200 dark:border-[#374151]">
+            <span className="text-[10px] font-extrabold text-[#607D8B] dark:text-[#B8C2CC] uppercase block">{l.max}</span>
+            <span className="text-2xl font-black text-[#263238] dark:text-[#F5F7FA] mt-1 block">₹{rate.max.toLocaleString()}</span>
+            <span className="text-[9px] text-[#607D8B] dark:text-[#B8C2CC] font-semibold block">{l.perQuintal}</span>
+          </div>
         </div>
-
-        <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
-          <span className="text-[10px] font-extrabold text-emerald-900 dark:text-emerald-300 uppercase block">{t.maxPrice || "Peak Grade A"}</span>
-          <span className="text-2xl font-black text-emerald-700 dark:text-[#66BB6A] mt-1 block">₹{rate.max.toLocaleString()}</span>
-          <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-semibold block">per quintal</span>
+      ) : (
+        <div className="p-4 rounded-2xl bg-[#F7F8FA] dark:bg-[#202A35] text-center text-xs font-bold text-amber-800 dark:text-amber-400">
+          {l.unavailable}
         </div>
+      )}
 
-        <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
-          <span className="text-[10px] font-extrabold text-indigo-950 dark:text-indigo-300 uppercase block">{t.modalPrice || "Modal Rate"}</span>
-          <span className="text-2xl font-black text-indigo-700 dark:text-indigo-400 mt-1 block">₹{rate.modal.toLocaleString()}</span>
-          <span className="text-[9px] text-indigo-800 dark:text-indigo-400 font-semibold block">per quintal</span>
-        </div>
-
-      </div>
-
-      <div className="text-center text-xs font-semibold text-[#607D8B] dark:text-[#B8C2CC] flex items-center justify-center gap-1">
-        <Calendar className="w-3.5 h-3.5 text-[#607D8B] dark:text-[#B8C2CC]" />
-        Rate Date: <strong className="text-[#263238] dark:text-[#F5F7FA]">{rate.date}</strong> • Source: <strong className="text-[#263238] dark:text-[#F5F7FA]">Official Market Data (Agmarknet)</strong>
+      {/* Footer Info */}
+      <div className="flex items-center justify-between text-[11px] text-[#607D8B] dark:text-[#B8C2CC] font-medium pt-1">
+        <span>{l.updated} {rate?.date || 'Today'}, {rate?.updated || 'Agmarknet APMC Feed'}</span>
+        <span className="font-bold text-[#66BB6A]">{rate?.name}</span>
       </div>
 
     </div>

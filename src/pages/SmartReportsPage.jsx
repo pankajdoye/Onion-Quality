@@ -9,6 +9,12 @@ export default function SmartReportsPage({ lang = 'en' }) {
   const t = SMART_I18N[lang] || SMART_I18N.en;
   const [activeReportRecord, setActiveReportRecord] = useState(null);
 
+  const subText = {
+    mr: "जतन केलेले कांदा स्कॅन इतिहास आणि अहवाल डाउनलोड",
+    hi: "सहेजा गया प्याज स्कैन इतिहास एवं रिपोर्ट डाउनलोड",
+    en: "Saved Onion History & Assessment Downloads"
+  };
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto px-4 pb-20">
       
@@ -16,7 +22,9 @@ export default function SmartReportsPage({ lang = 'en' }) {
       <div className="bg-white dark:bg-[#1F2933] border border-slate-200 dark:border-[#374151] rounded-3xl p-5 shadow-sm flex items-center justify-between transition-colors">
         <div>
           <h2 className="text-xl font-black text-[#263238] dark:text-[#F5F7FA]">{t.tabReports || "Quality Reports"}</h2>
-          <p className="text-xs text-[#607D8B] dark:text-[#B8C2CC] font-medium">Saved Onion History & Assessment Downloads</p>
+          <p className="text-xs text-[#607D8B] dark:text-[#B8C2CC] font-medium">
+            {subText[lang] || subText.en}
+          </p>
         </div>
       </div>
 
@@ -39,7 +47,7 @@ export default function SmartReportsPage({ lang = 'en' }) {
           onClose={() => setActiveReportRecord(null)}
           resultData={activeReportRecord}
           imageSrc={activeReportRecord.imageSrc}
-          currentLang={lang}
+          currentLang={activeReportRecord.lang || lang}
         />
       )}
 

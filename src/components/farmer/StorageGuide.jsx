@@ -19,6 +19,32 @@ import { SMART_I18N } from '../../utils/i18n_smart';
 export default function StorageGuide({ lang = 'en' }) {
   const t = SMART_I18N[lang] || SMART_I18N.en;
 
+  const labels = {
+    mr: {
+      badge: "शेतकऱ्यांसाठी व्यावहारिक साठवणूक पुस्तिका",
+      checklistTitle: "साठवणूक तपासणी सूची",
+      check1: "✓ कांद्याची मान मऊ आहे का तपासा",
+      check2: "✓ कांद्याचा थर ३-४ इंचांपेक्षा जास्त नसावा",
+      check3: "✓ कोंब आलेले कांदे त्वरित बाहेर काढा"
+    },
+    hi: {
+      badge: "किसानों के लिए व्यावहारिक भंडारण नियमावली",
+      checklistTitle: "भंडारण निरीक्षण चेकलिस्ट",
+      check1: "✓ गर्दन के पास नरमी की जांच करें",
+      check2: "✓ प्याज की परत 3-4 इंच से अधिक न रखें",
+      check3: "✓ अंकुरित प्याज को तुरंत अलग करें"
+    },
+    en: {
+      badge: "Practical Farmer Storage Manual",
+      checklistTitle: "Storage Inspection Checklist",
+      check1: "✓ Check necks for softness",
+      check2: "✓ Verify 3-4 inch layer depth",
+      check3: "✓ Discard sprouting onions"
+    }
+  };
+
+  const l = labels[lang] || labels.en;
+
   const sections = [
     {
       id: 1,
@@ -117,7 +143,7 @@ export default function StorageGuide({ lang = 'en' }) {
       <div className="bg-gradient-to-r from-emerald-800 via-teal-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-emerald-700/30">
         <div className="flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold w-fit mb-3">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Practical Farmer Storage Manual</span>
+          <span>{l.badge}</span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
           {t.storageGuideTitle}
@@ -168,17 +194,17 @@ export default function StorageGuide({ lang = 'en' }) {
       <div className="bg-white dark:bg-[#1F2933] border border-slate-200 dark:border-[#374151] rounded-3xl p-6 shadow-md space-y-4 transition-colors">
         <h3 className="font-extrabold text-lg text-[#263238] dark:text-[#F5F7FA] flex items-center gap-2">
           <CheckCircle2 className="w-5 h-5 text-[#66BB6A]" />
-          <span>Storage Inspection Checklist</span>
+          <span>{l.checklistTitle}</span>
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-bold text-[#263238] dark:text-[#F5F7FA]">
           <div className="p-3 rounded-xl bg-[#F7F8FA] dark:bg-[#202A35] border border-slate-200 dark:border-[#374151]">
-            ✓ Check necks for softness
+            {l.check1}
           </div>
           <div className="p-3 rounded-xl bg-[#F7F8FA] dark:bg-[#202A35] border border-slate-200 dark:border-[#374151]">
-            ✓ Verify 3-4 inch layer depth
+            {l.check2}
           </div>
           <div className="p-3 rounded-xl bg-[#F7F8FA] dark:bg-[#202A35] border border-slate-200 dark:border-[#374151]">
-            ✓ Discard sprouting onions
+            {l.check3}
           </div>
         </div>
       </div>

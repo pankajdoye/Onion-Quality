@@ -14,19 +14,69 @@ import {
 } from 'lucide-react';
 import { SMART_I18N } from '../../utils/i18n_smart';
 
-export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab, lang, setLang, theme, setTheme }) {
+export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab, lang = 'en', setLang, theme, setTheme }) {
   const t = SMART_I18N[lang] || SMART_I18N.en;
 
   if (!isOpen) return null;
 
+  const labels = {
+    mr: {
+      title: "स्मार्ट कांदा AI",
+      subtitle: "मानकीकृत गुणवत्ता प्रणाली",
+      navHome: "डॅशबोर्ड",
+      navCheck: "कांदा स्कॅन / अपलोड",
+      navHistory: "मागील अहवाल / इतिहास",
+      navReports: "गुणवत्ता रिपोर्ट",
+      navMarket: "बाजारभाव",
+      navStorage: "साठवणूक मार्गदर्शक",
+      navHelp: "मदत आणि सपोर्ट",
+      langTitle: "भाषा निवडा",
+      themeTitle: "रंग थीम",
+      light: "लाइट",
+      dark: "डार्क"
+    },
+    hi: {
+      title: "स्मार्ट प्याज AI",
+      subtitle: "मानकीकृत गुणवत्ता प्रणाली",
+      navHome: "डैशबोर्ड",
+      navCheck: "प्याज स्कैन / अपलोड",
+      navHistory: "पिछली रिपोर्ट / इतिहास",
+      navReports: "गुणवत्ता रिपोर्ट",
+      navMarket: "मंडी भाव",
+      navStorage: "भंडारण गाइड",
+      navHelp: "सहायता एवं सपोर्ट",
+      langTitle: "भाषा चुनें",
+      themeTitle: "रंग थीम",
+      light: "लाइट",
+      dark: "डार्क"
+    },
+    en: {
+      title: "AI Onion Quality Grading",
+      subtitle: "Standardized Vision System",
+      navHome: "Dashboard",
+      navCheck: "Scan / Upload",
+      navHistory: "History",
+      navReports: "Quality Reports",
+      navMarket: "Market Rates",
+      navStorage: "Storage Guide",
+      navHelp: "Help & Support",
+      langTitle: "Language",
+      themeTitle: "Appearance Theme",
+      light: "Light",
+      dark: "Dark"
+    }
+  };
+
+  const l = labels[lang] || labels.en;
+
   const navItems = [
-    { id: 'home', label: 'Dashboard', icon: Home },
-    { id: 'check', label: 'Scan / Upload', icon: Camera },
-    { id: 'history', label: 'History', icon: History },
-    { id: 'reports', label: 'Quality Reports', icon: FileText },
-    { id: 'market', label: 'Market Rates', icon: Store },
-    { id: 'storage', label: 'Storage Guide', icon: Warehouse },
-    { id: 'help', label: 'Help', icon: HelpCircle }
+    { id: 'home', label: l.navHome, icon: Home },
+    { id: 'check', label: l.navCheck, icon: Camera },
+    { id: 'history', label: l.navHistory, icon: History },
+    { id: 'reports', label: l.navReports, icon: FileText },
+    { id: 'market', label: l.navMarket, icon: Store },
+    { id: 'storage', label: l.navStorage, icon: Warehouse },
+    { id: 'help', label: l.navHelp, icon: HelpCircle }
   ];
 
   const handleNavClick = (id) => {
@@ -39,7 +89,7 @@ export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab, lang
       {/* Semi-transparent Backdrop Overlay */}
       <div 
         className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
-        onClick={onClose}
+        onClick={onClose} 
       />
 
       {/* Drawer Panel */}
@@ -50,10 +100,10 @@ export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab, lang
           <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-[#374151] flex items-center justify-between bg-[#F7F8FA] dark:bg-[#18212B]">
             <div>
               <h2 className="font-extrabold text-base text-[#263238] dark:text-[#F5F7FA] leading-tight">
-                AI Onion Quality Grading
+                {l.title}
               </h2>
               <p className="text-[11px] text-[#607D8B] dark:text-[#B8C2CC] font-medium mt-0.5">
-                Standardized Vision System
+                {l.subtitle}
               </p>
             </div>
 
@@ -99,7 +149,7 @@ export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab, lang
           {/* Language Selector */}
           <div>
             <div className="text-[10px] font-extrabold text-[#607D8B] dark:text-[#B8C2CC] mb-1.5 uppercase tracking-wider px-1">
-              Language
+              {l.langTitle}
             </div>
             <div className="grid grid-cols-3 gap-1 p-1 rounded-2xl bg-slate-200 dark:bg-[#202A35] border border-slate-300 dark:border-[#374151] text-xs font-bold">
               <button
@@ -135,10 +185,10 @@ export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab, lang
             </div>
           </div>
 
-          {/* Theme Selector (Requirement #6) */}
+          {/* Theme Selector */}
           <div>
             <div className="text-[10px] font-extrabold text-[#607D8B] dark:text-[#B8C2CC] mb-1.5 uppercase tracking-wider px-1">
-              Theme
+              {l.themeTitle}
             </div>
             <div className="grid grid-cols-2 gap-1 p-1 rounded-2xl bg-slate-200 dark:bg-[#202A35] border border-slate-300 dark:border-[#374151]">
               <button
@@ -150,7 +200,7 @@ export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab, lang
                 }`}
               >
                 <Sun className="w-4 h-4 text-amber-500" />
-                <span>Light</span>
+                <span>{l.light}</span>
               </button>
 
               <button
@@ -162,7 +212,7 @@ export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab, lang
                 }`}
               >
                 <Moon className="w-4 h-4 text-indigo-400" />
-                <span>Dark</span>
+                <span>{l.dark}</span>
               </button>
             </div>
           </div>

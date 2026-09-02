@@ -11,6 +11,23 @@ export default function SmartMarketPage({ lang = 'en' }) {
   const t = SMART_I18N[lang] || SMART_I18N.en;
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
+  const labels = {
+    mr: {
+      sub: "दैनंदिन अधिकृत बाजार समिती भाव आणि विक्री निर्णय",
+      alertBtn: "भाव अलर्ट सेट करा"
+    },
+    hi: {
+      sub: "दैनिक आधिकारिक मंडी भाव एवं बिक्री निर्णय सहायता",
+      alertBtn: "भाव अलर्ट सेट करें"
+    },
+    en: {
+      sub: "Daily Official APMC Rates & Decision Support",
+      alertBtn: "Set Price Alert"
+    }
+  };
+
+  const l = labels[lang] || labels.en;
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto px-4 pb-20">
       
@@ -18,7 +35,7 @@ export default function SmartMarketPage({ lang = 'en' }) {
       <div className="bg-white dark:bg-[#1F2933] border border-slate-200 dark:border-[#374151] rounded-3xl p-5 shadow-sm flex items-center justify-between transition-colors">
         <div>
           <h2 className="text-xl font-black text-[#263238] dark:text-[#F5F7FA]">{t.tabMarket || "Market Rates"}</h2>
-          <p className="text-xs text-[#607D8B] dark:text-[#B8C2CC] font-medium">Daily Official APMC Rates & Decision Support</p>
+          <p className="text-xs text-[#607D8B] dark:text-[#B8C2CC] font-medium">{l.sub}</p>
         </div>
 
         <button
@@ -26,7 +43,7 @@ export default function SmartMarketPage({ lang = 'en' }) {
           className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-[#F59E0B] hover:bg-amber-600 text-slate-950 font-extrabold text-xs shadow-sm transition-all active:scale-95"
         >
           <Bell className="w-4 h-4" />
-          <span>Set Price Alert</span>
+          <span>{l.alertBtn}</span>
         </button>
       </div>
 

@@ -5,12 +5,26 @@
     "expected": "Detected",
     "status": "PASSED",
     "result": {
-      "status": "rejected",
-      "stage": 1,
-      "is_onion": false,
-      "onion_confidence": 0.1494,
-      "rejection_reason": "not_an_onion",
-      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+      "status": "success",
+      "stage": 2,
+      "is_onion": true,
+      "onion_confidence": 0.7523,
+      "quality_confidence": 0.94,
+      "quality_score": 58.7,
+      "quality_condition": "Defective",
+      "is_single_onion": true,
+      "detected_onions_count": 1,
+      "single_onion_notice": "Single-onion analysis cannot represent the quality of your entire batch. For better batch estimation, photograph multiple onions.",
+      "grade_a": 40,
+      "grade_b": 42,
+      "urs": 18,
+      "damaged": 8.0,
+      "rotten": 4.0,
+      "sprouted": 2.0,
+      "undersized": 5,
+      "average_diameter": 68,
+      "average_weight": 85,
+      "message": "Onion detected successfully."
     }
   },
   {
@@ -23,10 +37,22 @@
       "stage": 2,
       "is_onion": true,
       "onion_confidence": 1.0,
-      "quality_confidence": 0.92,
+      "quality_confidence": 0.94,
       "quality_score": 92.0,
       "quality_condition": "Healthy",
-      "message": "Onion Detected successfully."
+      "is_single_onion": true,
+      "detected_onions_count": 1,
+      "single_onion_notice": "Single-onion analysis cannot represent the quality of your entire batch. For better batch estimation, photograph multiple onions.",
+      "grade_a": 78,
+      "grade_b": 16,
+      "urs": 6,
+      "damaged": 4.0,
+      "rotten": 1.0,
+      "sprouted": 1.0,
+      "undersized": 5,
+      "average_diameter": 68,
+      "average_weight": 85,
+      "message": "Onion detected successfully."
     }
   },
   {
@@ -40,7 +66,7 @@
       "is_onion": false,
       "onion_confidence": 0.1897,
       "rejection_reason": "not_an_onion",
-      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+      "message": "Please capture a clear photo of the onion."
     }
   },
   {
@@ -54,7 +80,7 @@
       "is_onion": false,
       "onion_confidence": 0.148,
       "rejection_reason": "not_an_onion",
-      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+      "message": "Please capture a clear photo of the onion."
     }
   },
   {
@@ -68,7 +94,7 @@
       "is_onion": false,
       "onion_confidence": 0.1897,
       "rejection_reason": "not_an_onion",
-      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+      "message": "Please capture a clear photo of the onion."
     }
   },
   {
@@ -82,7 +108,7 @@
       "is_onion": false,
       "onion_confidence": 0.1906,
       "rejection_reason": "not_an_onion",
-      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+      "message": "Please capture a clear photo of the onion."
     }
   },
   {
@@ -96,7 +122,7 @@
       "is_onion": false,
       "onion_confidence": 0.1858,
       "rejection_reason": "not_an_onion",
-      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+      "message": "Please capture a clear photo of the onion."
     }
   },
   {
@@ -110,7 +136,7 @@
       "is_onion": false,
       "onion_confidence": 0.1705,
       "rejection_reason": "not_an_onion",
-      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+      "message": "Please capture a clear photo of the onion."
     }
   },
   {
@@ -124,7 +150,7 @@
       "is_onion": false,
       "onion_confidence": 0.1223,
       "rejection_reason": "not_an_onion",
-      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+      "message": "Please capture a clear photo of the onion."
     }
   },
   {
@@ -138,7 +164,7 @@
       "is_onion": false,
       "onion_confidence": 0.1323,
       "rejection_reason": "not_an_onion",
-      "message": "\ud83e\uddc5 Onion Not Detected. We couldn't find a clear onion in this image."
+      "message": "Please capture a clear photo of the onion."
     }
   }
 ]

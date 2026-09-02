@@ -3,9 +3,35 @@ import { Menu, Sun, Moon, WifiOff } from 'lucide-react';
 import Sidebar from './Sidebar';
 import { SMART_I18N } from '../../utils/i18n_smart';
 
-export default function SmartHeader({ lang, setLang, mode, setMode, activeTab, setActiveTab, theme, setTheme, isOnline = true }) {
+export default function SmartHeader({ lang = 'en', setLang, mode, setMode, activeTab, setActiveTab, theme, setTheme, isOnline = true }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const t = SMART_I18N[lang] || SMART_I18N.en;
+
+  const labels = {
+    mr: {
+      menu: "मेनू",
+      title: "स्मार्ट कांदा AI ग्रेडिंग",
+      offline: "ऑफलाइन",
+      light: "लाइट",
+      dark: "डार्क"
+    },
+    hi: {
+      menu: "मेनू",
+      title: "स्मार्ट प्याज AI ग्रेडिंग",
+      offline: "ऑफलाइन",
+      light: "लाइट",
+      dark: "डार्क"
+    },
+    en: {
+      menu: "Menu",
+      title: "AI Onion Quality Grading",
+      offline: "Offline",
+      light: "Light",
+      dark: "Dark"
+    }
+  };
+
+  const l = labels[lang] || labels.en;
 
   return (
     <>
@@ -17,24 +43,24 @@ export default function SmartHeader({ lang, setLang, mode, setMode, activeTab, s
             <button
               onClick={() => setIsSidebarOpen(true)}
               className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl bg-slate-100 dark:bg-[#202A35] hover:bg-slate-200 dark:hover:bg-[#2c3847] text-[#263238] dark:text-[#F5F7FA] font-bold text-xs border border-slate-200 dark:border-[#374151] transition-all active:scale-95 shrink-0"
-              title="Open Menu"
-              aria-label="Open Navigation Sidebar"
+              title={l.menu}
+              aria-label={l.menu}
             >
               <Menu className="w-4 h-4" />
-              <span className="font-bold">Menu</span>
+              <span className="font-bold">{l.menu}</span>
             </button>
 
-            {/* Clean minimal title - No square icon */}
+            {/* Clean minimal title */}
             <div 
               className="cursor-pointer" 
               onClick={() => setActiveTab('home')}
             >
               <h1 className="font-black text-sm sm:text-base md:text-lg text-[#263238] dark:text-[#F5F7FA] tracking-tight leading-none whitespace-nowrap">
-                AI Onion Quality Grading
+                {l.title}
               </h1>
               {!isOnline && (
                 <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-100 text-rose-800 border border-rose-300 ml-2">
-                  <WifiOff className="w-2.5 h-2.5" /> Offline
+                  <WifiOff className="w-2.5 h-2.5" /> {l.offline}
                 </span>
               )}
             </div>
@@ -52,12 +78,13 @@ export default function SmartHeader({ lang, setLang, mode, setMode, activeTab, s
                     ? 'bg-white text-[#263238] shadow-sm font-black ring-1 ring-slate-200'
                     : 'text-[#607D8B] dark:text-[#B8C2CC] hover:text-[#263238] dark:hover:text-[#F5F7FA]'
                 }`}
-                title="Switch to Light Mode"
-                aria-label="Switch to Light Mode"
+                title="Light Mode"
+                aria-label="Light Mode"
               >
                 <Sun className="w-3.5 h-3.5 text-amber-500" />
-                <span className="hidden md:inline">Light</span>
+                <span className="hidden md:inline">{l.light}</span>
               </button>
+
               <button
                 onClick={() => setTheme('dark')}
                 className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-all ${
@@ -65,11 +92,11 @@ export default function SmartHeader({ lang, setLang, mode, setMode, activeTab, s
                     ? 'bg-[#121820] text-[#F5F7FA] shadow-sm font-black ring-1 ring-[#374151]'
                     : 'text-[#607D8B] dark:text-[#B8C2CC] hover:text-[#263238] dark:hover:text-[#F5F7FA]'
                 }`}
-                title="Switch to Dark Mode"
-                aria-label="Switch to Dark Mode"
+                title="Dark Mode"
+                aria-label="Dark Mode"
               >
                 <Moon className="w-3.5 h-3.5 text-indigo-400" />
-                <span className="hidden md:inline">Dark</span>
+                <span className="hidden md:inline">{l.dark}</span>
               </button>
             </div>
 

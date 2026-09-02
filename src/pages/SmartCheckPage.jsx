@@ -1,32 +1,32 @@
 import React, { useState } from 'react';
+import { Camera, Upload, CheckCircle2, AlertTriangle, RefreshCw, FileText, Download } from 'lucide-react';
 import OneTapCheck from '../components/farmer/OneTapCheck';
-import ProcessingState from '../components/assessment/ProcessingState';
-import ImageRejectionCard from '../components/farmer/ImageRejectionCard';
-import LowConfidenceCard from '../components/farmer/LowConfidenceCard';
-import SingleOnionNotice from '../components/farmer/SingleOnionNotice';
 import TopResultCard from '../components/farmer/TopResultCard';
 import InteractiveImageResult from '../components/farmer/InteractiveImageResult';
 import StorageAdviceCard from '../components/farmer/StorageAdviceCard';
 import SimpleProfitCalculator from '../components/farmer/ProfitCalculator';
+import ImageRejectionCard from '../components/farmer/ImageRejectionCard';
+import LowConfidenceCard from '../components/farmer/LowConfidenceCard';
+import SingleOnionNotice from '../components/farmer/SingleOnionNotice';
+import ProcessingState from '../components/assessment/ProcessingState';
 import ReportDownloadModal from '../components/assessment/ReportDownloadModal';
-import { SMART_I18N } from '../utils/i18n_smart';
-import { analyzeOnionSample } from '../services/aiService';
+import { analyzeOnionQuality } from '../services/aiService';
 import { saveScanRecord } from '../services/historyService';
-import { Download, RefreshCw, FileText } from 'lucide-react';
+import { SMART_I18N } from '../utils/i18n_smart';
 
 export default function SmartCheckPage({ lang = 'en' }) {
-  const t = SMART_I18N[lang] || SMART_I18N.en;
   const [selectedImage, setSelectedImage] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+  const t = SMART_I18N[lang] || SMART_I18N.en;
 
   const handleImageSelected = async (imageSrc, presetType = null) => {
     setSelectedImage(imageSrc);
     setIsAnalyzing(true);
     setAnalysisResult(null);
 
-    const result = await analyzeOnionSample({
+    const result = await analyzeOnionQuality({
       imageSrc,
       presetType
     });
@@ -39,7 +39,8 @@ export default function SmartCheckPage({ lang = 'en' }) {
       if (result.data && result.data.is_onion) {
         saveScanRecord({
           ...result.data,
-          imageSrc
+          imageSrc,
+          lang
         });
       }
 
@@ -54,7 +55,7 @@ export default function SmartCheckPage({ lang = 'en' }) {
         rejection_reason: "not_an_onion",
         is_onion: false,
         onion_confidence: 0.10,
-        message: "🧅 Onion Not Detected. Quality score cannot be generated for non-onion images."
+        message: "Please capture a clear photo of the onion."
       });
     }
   };
@@ -65,14 +66,40 @@ export default function SmartCheckPage({ lang = 'en' }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const uiText = {
+    mr: {
+      header: "कांद्याचा फोटो काढा किंवा अपलोड करा",
+      sub: "मानकीकृत AI संगणक दृष्टी गुणवत्ता मूल्यमापन",
+      reset: "नवीन फोटो तपासा",
+      completeTitle: "तपासणी पूर्ण झाली",
+      completeSub: "AI अचूकतेने गुणवत्ता श्रेणी निश्चित केली आहे"
+    },
+    hi: {
+      header: "प्याज की फोटो खींचें या अपलोड करें",
+      sub: "मानकीकृत AI कंप्यूटर विज़न गुणवत्ता मूल्यांकन",
+      reset: "नया फोटो जांचें",
+      completeTitle: "जांच पूर्ण हुई",
+      completeSub: "AI सटीकता के साथ गुणवत्ता ग्रेड निर्धारित की गई है"
+    },
+    en: {
+      header: "Scan / Upload Onion",
+      sub: "Standardized AI Vision Quality Assessment",
+      reset: "Check New Photo",
+      completeTitle: "Analysis Complete",
+      completeSub: "Quality graded with AI confidence"
+    }
+  };
+
+  const u = uiText[lang] || uiText.en;
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto px-4 pb-20">
       
       {/* Header Banner */}
       <div className="bg-white dark:bg-[#1F2933] border border-slate-200 dark:border-[#374151] rounded-3xl p-5 shadow-sm flex items-center justify-between transition-colors">
         <div>
-          <h2 className="text-xl font-black text-[#263238] dark:text-[#F5F7FA]">Scan / Upload Onion</h2>
-          <p className="text-xs text-[#607D8B] dark:text-[#B8C2CC] font-medium">Standardized AI Vision Quality Assessment</p>
+          <h2 className="text-xl font-black text-[#263238] dark:text-[#F5F7FA]">{u.header}</h2>
+          <p className="text-xs text-[#607D8B] dark:text-[#B8C2CC] font-medium">{u.sub}</p>
         </div>
 
         {analysisResult && (
@@ -81,7 +108,7 @@ export default function SmartCheckPage({ lang = 'en' }) {
             className="p-2.5 rounded-xl bg-slate-100 dark:bg-[#202A35] text-[#263238] dark:text-[#F5F7FA] font-bold text-xs border border-slate-200 dark:border-[#374151] flex items-center gap-1 hover:bg-slate-200 dark:hover:bg-[#263238] transition-all"
           >
             <RefreshCw className="w-4 h-4" />
-            Check New Photo
+            {u.reset}
           </button>
         )}
       </div>
@@ -120,7 +147,7 @@ export default function SmartCheckPage({ lang = 'en' }) {
 
           {/* SINGLE ONION BATCH WARNING NOTICE */}
           {analysisResult.status === 'success' && analysisResult.is_onion && !analysisResult.is_uncertain && analysisResult.is_single_onion && (
-            <SingleOnionNotice />
+            <SingleOnionNotice lang={lang} />
           )}
 
           {/* STAGE 2 PASSED: FULL QUALITY RESULTS FOR VALID ONIONS ONLY */}
@@ -133,8 +160,8 @@ export default function SmartCheckPage({ lang = 'en' }) {
                     ✓
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-sm sm:text-base">Analysis Complete</h3>
-                    <p className="text-[11px] text-emerald-100 font-medium">Quality graded with AI confidence</p>
+                    <h3 className="font-extrabold text-sm sm:text-base">{u.completeTitle}</h3>
+                    <p className="text-[11px] text-emerald-100 font-medium">{u.completeSub}</p>
                   </div>
                 </div>
 

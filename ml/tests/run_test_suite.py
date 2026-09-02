@@ -19,7 +19,10 @@ def main():
 
     test_dir = BASE_DIR / "ml" / "datasets" / "test"
 
-    onion_samples = list((test_dir / "validator" / "onion").glob("*.*")) if (test_dir / "validator" / "onion").exists() else []
+    real_bulb_dir = BASE_DIR / "Onion Leaves and Bulb Dataset" / "New Onion - Copy" / "2. Bulb" / "1. Healthy" / "1. Red Onion" / "1. Single"
+    real_bulb_samples = list(real_bulb_dir.glob("*.jpg")) if real_bulb_dir.exists() else []
+
+    onion_samples = real_bulb_samples if real_bulb_samples else (list((test_dir / "validator" / "onion").glob("*.*")) if (test_dir / "validator" / "onion").exists() else [])
     non_onion_samples = list((test_dir / "validator" / "non_onion").glob("*.*")) if (test_dir / "validator" / "non_onion").exists() else []
     leaf_samples = list((test_dir / "leaf" / "unhealthy").glob("*.*")) if (test_dir / "leaf" / "unhealthy").exists() else []
     defective_samples = list((test_dir / "quality" / "defective").glob("*.*")) if (test_dir / "quality" / "defective").exists() else []

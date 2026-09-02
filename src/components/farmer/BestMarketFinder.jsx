@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { MapPin, Navigation, Truck, Award, CheckCircle2 } from 'lucide-react';
+import React from 'react';
+import { MapPin, Navigation } from 'lucide-react';
 import { SMART_I18N } from '../../utils/i18n_smart';
 
-export default function BestMarketFinder({ lang = 'mr' }) {
-  const t = SMART_I18N[lang] || SMART_I18N.mr;
-  const [quantity, setQuantity] = useState(20);
+export default function BestMarketFinder({ lang = 'en' }) {
+  const t = SMART_I18N[lang] || SMART_I18N.en;
 
   const markets = [
     {
@@ -29,13 +28,57 @@ export default function BestMarketFinder({ lang = 'mr' }) {
       isBestOverall: false
     },
     {
-      name: 'Sangli APMC Market',
+      name: 'Sangli APMC',
       pricePerQtnl: 2520,
       transportPerQtnl: 280,
       distance: '240 km',
       isBestOverall: false
     }
   ];
+
+  const labels = {
+    mr: {
+      title: "सर्वोत्तम बाजार समिती आणि निव्वळ नफा",
+      sub: "वाहतूक खर्च वजा करून खऱ्या निव्वळ नफ्याची तुलना",
+      bestOption: "तुमच्यासाठी सर्वोत्तम पर्याय",
+      lowestTransport: "कमी वाहतूक खर्च",
+      thMarket: "बाजार समिती",
+      thMandiRate: "मंडी भाव",
+      thTransport: "वाहतूक खर्च / क्विंटल",
+      thNet: "निव्वळ प्राप्ती",
+      thRec: "शिफारस",
+      bestTag: "⭐ सर्वोत्तम पर्याय",
+      avgTag: "साधारण पर्याय"
+    },
+    hi: {
+      title: "सर्वोत्तम मंडी एवं शुद्ध मुनाफा",
+      sub: "परिवहन खर्च घटाकर वास्तविक शुद्ध आय की तुलना",
+      bestOption: "आपके लिए सर्वोत्तम विकल्प",
+      lowestTransport: "न्यूनतम परिवहन खर्च",
+      thMarket: "मंडी",
+      thMandiRate: "मंडी भाव",
+      thTransport: "परिवहन / क्विंटल",
+      thNet: "शुद्ध आय",
+      thRec: "सिफारिश",
+      bestTag: "⭐ सर्वश्रेष्ठ विकल्प",
+      avgTag: "सामान्य विकल्प"
+    },
+    en: {
+      title: "Best Market Net Return",
+      sub: "Includes transport cost calculation to find true net earnings",
+      bestOption: "Best Return Option",
+      lowestTransport: "Lowest Transport Cost",
+      thMarket: "Market",
+      thMandiRate: "Mandi Rate",
+      thTransport: "Transport / Qtnl",
+      thNet: "Net Earnings",
+      thRec: "Recommendation",
+      bestTag: "⭐ Best Option",
+      avgTag: "Average Option"
+    }
+  };
+
+  const l = labels[lang] || labels.en;
 
   return (
     <div className="bg-white dark:bg-[#1F2933] rounded-3xl border border-slate-200 dark:border-[#374151] p-6 shadow-md space-y-5 transition-colors">
@@ -44,9 +87,9 @@ export default function BestMarketFinder({ lang = 'mr' }) {
         <div>
           <h3 className="text-sm font-black text-[#263238] dark:text-[#F5F7FA] uppercase tracking-wider flex items-center gap-2">
             <MapPin className="w-4 h-4 text-[#66BB6A]" />
-            📍 {t.bestMarketTitle || "Best Market Net Return"}
+            📍 {l.title}
           </h3>
-          <p className="text-xs text-[#607D8B] dark:text-[#B8C2CC] font-medium">Includes transport cost calculation to find true net earnings</p>
+          <p className="text-xs text-[#607D8B] dark:text-[#B8C2CC] font-medium">{l.sub}</p>
         </div>
       </div>
 
@@ -57,12 +100,12 @@ export default function BestMarketFinder({ lang = 'mr' }) {
             ⭐
           </div>
           <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-100 block">{t.bestOptionForYou || "Best Return Option"}</span>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-100 block">{l.bestOption}</span>
             <h4 className="text-lg font-black text-white">Nashik Main APMC Yard (₹2,550 Net / Qtnl)</h4>
           </div>
         </div>
         <span className="hidden sm:inline-block px-3 py-1 bg-white text-emerald-800 text-xs font-black rounded-full shadow">
-          Lowest Transport Cost
+          {l.lowestTransport}
         </span>
       </div>
 
@@ -71,11 +114,11 @@ export default function BestMarketFinder({ lang = 'mr' }) {
         <table className="w-full text-xs text-left">
           <thead className="bg-[#F7F8FA] dark:bg-[#202A35] text-[#607D8B] dark:text-[#B8C2CC] font-bold uppercase text-[10px] border-b border-slate-200 dark:border-[#374151]">
             <tr>
-              <th className="py-3 px-3">Market</th>
-              <th className="py-3 px-3">Mandi Rate</th>
-              <th className="py-3 px-3">Transport / Qtnl</th>
-              <th className="py-3 px-3">Net Earnings</th>
-              <th className="py-3 px-3 text-right">Recommendation</th>
+              <th className="py-3 px-3">{l.thMarket}</th>
+              <th className="py-3 px-3">{l.thMandiRate}</th>
+              <th className="py-3 px-3">{l.thTransport}</th>
+              <th className="py-3 px-3">{l.thNet}</th>
+              <th className="py-3 px-3 text-right">{l.thRec}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-[#374151]">
@@ -93,11 +136,11 @@ export default function BestMarketFinder({ lang = 'mr' }) {
                   <td className="py-3 px-3 text-right">
                     {m.isBestOverall ? (
                       <span className="px-2.5 py-1 rounded-full font-black text-[11px] bg-[#66BB6A] text-white shadow">
-                        ⭐ Best Option
+                        {l.bestTag}
                       </span>
                     ) : (
                       <span className="px-2.5 py-1 rounded-full font-semibold text-[11px] bg-slate-100 dark:bg-[#202A35] text-[#607D8B] dark:text-[#B8C2CC] border border-slate-200 dark:border-[#374151]">
-                        Average Option
+                        {l.avgTag}
                       </span>
                     )}
                   </td>
