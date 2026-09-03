@@ -6,7 +6,41 @@
  * Non-onion images are rejected with zero fake scores or fabricated predictions.
  */
 
-const API_BASE_URL = import.meta.env.VITE_AI_API_URL || 'http://localhost:8000';
+export function getBackendUrl() {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('ONION_BACKEND_URL');
+    if (saved && saved.trim()) return saved.trim().replace(/\/+$/, '');
+  }
+  const envUrl = import.meta.env.VITE_AI_API_URL;
+  if (envUrl && envUrl.trim()) return envUrl.trim().replace(/\/+$/, '');
+  return 'http://localhost:8000';
+}
+
+export function setBackendUrl(url) {
+  if (typeof window !== 'undefined' && url) {
+    const clean = url.trim().replace(/\/+$/, '');
+    localStorage.setItem('ONION_BACKEND_URL', clean);
+    return clean;
+  }
+  return null;
+}
+
+export async function checkBackendHealth() {
+  const baseUrl = getBackendUrl();
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(`${baseUrl}/`, { signal: controller.signal });
+    clearTimeout(id);
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { online: true, data, url: baseUrl };
+    }
+  } catch (e) {
+    // Handled below
+  }
+  return { online: false, url: baseUrl };
+}
 
 function dataUrlToBlob(dataUrl) {
   try {
@@ -45,6 +79,8 @@ export async function analyzeOnionSample({ imageFile, imageSrc, sampleId, batchI
     };
   }
 
+  const baseUrl = getBackendUrl();
+
   // 2. Real API Call to PyTorch & YOLO Backend
   try {
     const formData = new FormData();
@@ -68,9 +104,10 @@ export async function analyzeOnionSample({ imageFile, imageSrc, sampleId, batchI
     formData.append('market', market);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout for CPU inference
+    // Allow up to 60 seconds for Render free tier cold-starts
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
 
-    const response = await fetch(`${API_BASE_URL}/api/analyze`, {
+    const response = await fetch(`${baseUrl}/api/analyze`, {
       method: 'POST',
       body: formData,
       signal: controller.signal
@@ -100,7 +137,17 @@ export async function analyzeOnionSample({ imageFile, imageSrc, sampleId, batchI
       };
     }
   } catch (error) {
+    const isLocalhost = baseUrl.includes('localhost');
+    const isRemoteClient = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
     console.warn('Real AI API call failed or timed out:', error);
+
+    let friendlyMessage = `Unable to connect to AI backend server (${baseUrl}).`;
+    if (error.name === 'AbortError') {
+      friendlyMessage = "The AI backend is waking up (Render free tier takes ~30s on first request). Please try again in a moment.";
+    } else if (isLocalhost && isRemoteClient) {
+      friendlyMessage = "Backend URL is not connected yet. Please configure your Render backend URL.";
+    }
+
     return {
       success: false,
       source: 'network_error',
@@ -109,7 +156,8 @@ export async function analyzeOnionSample({ imageFile, imageSrc, sampleId, batchI
         stage: 1,
         rejection_reason: 'network_error',
         is_onion: false,
-        message: "Unable to connect to AI backend server (http://localhost:8000). Please verify backend is running."
+        backend_url: baseUrl,
+        message: friendlyMessage
       }
     };
   }

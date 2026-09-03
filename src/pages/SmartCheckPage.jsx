@@ -146,6 +146,7 @@ export default function SmartCheckPage({ lang = 'en' }) {
           {(analysisResult.status === 'rejected' || !analysisResult.is_onion) && (
             <ImageRejectionCard
               message={analysisResult.message}
+              rejectionReason={analysisResult.rejection_reason}
               onRetryCamera={handleReset}
               onRetryUpload={handleReset}
               lang={lang}

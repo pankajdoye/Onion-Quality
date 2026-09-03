@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Menu, Sun, Moon, WifiOff } from 'lucide-react';
+import { Menu, Sun, Moon, WifiOff, Server } from 'lucide-react';
 import Sidebar from './Sidebar';
+import BackendConfigModal from './BackendConfigModal';
 import { SMART_I18N } from '../../utils/i18n_smart';
 
 export default function SmartHeader({ lang = 'en', setLang, mode, setMode, activeTab, setActiveTab, theme, setTheme, isOnline = true }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isBackendModalOpen, setIsBackendModalOpen] = useState(false);
   const t = SMART_I18N[lang] || SMART_I18N.en;
 
   const labels = {
@@ -66,9 +67,19 @@ export default function SmartHeader({ lang = 'en', setLang, mode, setMode, activ
             </div>
           </div>
 
-          {/* Right: Light/Dark Theme Control + Language Selector */}
+          {/* Right: Backend Config + Theme Control + Language Selector */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
+            {/* Quick Backend Config Button */}
+            <button
+              onClick={() => setIsBackendModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-[#202A35] hover:bg-slate-200 dark:hover:bg-[#2c3847] text-xs font-extrabold text-[#263238] dark:text-[#F5F7FA] border border-slate-200 dark:border-[#374151] transition-all active:scale-95"
+              title="Connect AI Backend Server"
+            >
+              <Server className="w-3.5 h-3.5 text-[#66BB6A]" />
+              <span className="hidden sm:inline">Backend</span>
+            </button>
+
             {/* Useful Light / Dark Control */}
             <div className="flex items-center bg-slate-100 dark:bg-[#202A35] p-0.5 sm:p-1 rounded-xl border border-slate-200 dark:border-[#374151] text-xs font-bold">
               <button
@@ -126,7 +137,7 @@ export default function SmartHeader({ lang = 'en', setLang, mode, setMode, activ
                 onClick={() => setLang('mr')}
                 className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all ${
                   lang === 'mr' 
-                    ? 'bg-[#66BB6A] text-white shadow-sm font-black' 
+                    ? 'bg-orange-600 text-white shadow-sm font-black' 
                     : 'text-[#607D8B] dark:text-[#B8C2CC] hover:text-[#263238] dark:hover:text-[#F5F7FA]'
                 }`}
               >
@@ -149,6 +160,13 @@ export default function SmartHeader({ lang = 'en', setLang, mode, setMode, activ
         setLang={setLang}
         theme={theme}
         setTheme={setTheme}
+      />
+
+      {/* AI Backend Configuration Modal */}
+      <BackendConfigModal
+        isOpen={isBackendModalOpen}
+        onClose={() => setIsBackendModalOpen(false)}
+        lang={lang}
       />
     </>
   );
