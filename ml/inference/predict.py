@@ -196,15 +196,16 @@ class OnionAIEngine:
                 validator_logits = self.validator_model(tensor_img)
                 validator_prob = torch.sigmoid(validator_logits).item()
 
-        # 4. Stage 2: Multi-Bulb Detection via YOLO (using EXIF-transposed upright cv_img)
-        cv_img = cv2.cvtColor(np.array(img_rgb), cv2.COLOR_RGB2BGR)
+        # 4. Stage 2: Multi-Bulb Detection via YOLO
+        cv_img = cv2.imdecode(np.fromfile(str(image_path), dtype=np.uint8), cv2.IMREAD_COLOR)
+        if cv_img is None:
+            cv_img = cv2.cvtColor(np.array(img_rgb), cv2.COLOR_RGB2BGR)
 
         onion_detected_boxes = []
         bulb_candidate_boxes = []
-        non_bulb_boxes = []
         if self.yolo_model is not None and cv_img is not None:
             try:
-                yolo_res = self.yolo_model(cv_img, conf=0.08, verbose=False)[0]
+                yolo_res = self.yolo_model(cv_img, conf=0.18, verbose=False)[0]
                 for b in yolo_res.boxes:
                     cls_id = int(b.cls[0])
                     cls_name = self.yolo_model.names[cls_id]
@@ -212,34 +213,26 @@ class OnionAIEngine:
                     xyxy = b.xyxy[0].tolist()
                     
                     is_onion_class = 'onion' in cls_name.lower()
-                    is_round_produce = any(k in cls_name.lower() for k in ['brinjal', 'potato'])
-                    is_non_bulb = any(k in cls_name.lower() for k in ['tomato', 'bitter_gourd', 'pointed_gourd', 'capsicum'])
+                    is_round_produce = any(k in cls_name.lower() for k in ['capsicum', 'brinjal', 'potato'])
                     
                     box_w = xyxy[2] - xyxy[0]
                     box_h = xyxy[3] - xyxy[1]
                     aspect_ratio = box_w / max(1, box_h)
                     
-                    if is_onion_class and conf >= 0.08:
+                    if is_onion_class and conf >= 0.20:
                         onion_detected_boxes.append((conf, xyxy, cls_name))
-                    elif is_round_produce and conf >= 0.10 and (0.40 <= aspect_ratio <= 2.5):
+                    elif is_round_produce and conf >= 0.25 and (0.50 <= aspect_ratio <= 2.0):
                         bulb_candidate_boxes.append((conf, xyxy, cls_name))
-                    elif is_non_bulb and conf >= 0.60:
-                        non_bulb_boxes.append((conf, xyxy, cls_name))
             except Exception as e:
                 print(f"YOLO error: {e}")
 
-        # Robust Onion Verification Gate (supports real phone photos, close-ups, and multi-bulb overviews)
-        has_onion_detection = len(onion_detected_boxes) > 0
-        has_bulb_detection = len(bulb_candidate_boxes) > 0
-        has_validator_onion = (validator_prob >= 0.16)
+        # The image is verified as an onion ONLY if:
+        # (1) Validator prob >= 0.22 OR
+        # (2) YOLO has explicit onion detection ('fresh_onion' or 'defected_onion') >= 0.20
+        has_yolo_onion = len(onion_detected_boxes) > 0 and max([c for c, _, _ in onion_detected_boxes]) >= 0.20
+        is_onion_valid = (validator_prob >= calibrated_threshold) or has_yolo_onion
 
-        is_onion_valid = has_onion_detection or has_bulb_detection or has_validator_onion
-
-        # Reject if clear non-bulb produce (e.g. tomato, bitter gourd, capsicum) dominates with no onion detection
-        if not has_onion_detection and len(non_bulb_boxes) > 0 and validator_prob < 0.22:
-            is_onion_valid = False
-
-        # If verified as an onion scene, pool all candidate bulb boxes:
+        # If verified as an onion scene, pool all candidate bulb boxes for multi-bulb counting:
         if is_onion_valid:
             all_boxes = onion_detected_boxes + bulb_candidate_boxes
         else:
@@ -280,9 +273,9 @@ class OnionAIEngine:
                 "message": "Onion not detected. Please capture a clear onion image."
             }
 
-        # Fallback to single centered bulb if YOLO found no boxes but validator verified onion (close-up single bulb)
+        # Fallback to single centered bulb if YOLO found no boxes but validator verified onion
         if len(filtered_boxes) == 0:
-            filtered_boxes = [(max(0.85, validator_prob), [0.08 * w, 0.08 * h, 0.92 * w, 0.92 * h], 'fresh_onion')]
+            filtered_boxes = [(max(0.85, validator_prob), [0.10 * w, 0.10 * h, 0.90 * w, 0.90 * h], 'fresh_onion')]
 
         # 5. Analyze each individual detected onion bulb
         individual_onions = []
@@ -349,14 +342,10 @@ class OnionAIEngine:
             if is_undersized:
                 visible_defects.append({"type": "undersized", "severity": "low", "label": "Undersized (<45mm)"})
 
-            yolo_has_defect = "defected" in cls_name.lower()
-            if yolo_has_defect and not visible_defects:
-                visible_defects.append({"type": "blemish", "severity": "medium", "label": "Surface Defect / Blemish"})
-
             # Base Local Quality & Grade Assignment
             # A clearly rotten or severely damaged onion MUST NOT be marked GOOD.
             has_severe_defect = (rot == "Detected") or (damage == "Severe")
-            has_minor_defect = (damage == "Minor") or (sprouting == "Detected") or (crack == "Detected") or (discoloration == "Detected") or is_undersized or yolo_has_defect
+            has_minor_defect = (damage == "Minor") or (sprouting == "Detected") or (crack == "Detected") or (discoloration == "Detected") or is_undersized
 
             if has_severe_defect:
                 local_quality = "POOR"

@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-def check_image_quality(image_path_or_bytes, min_blur_var: float = 2.0, min_brightness: float = 10.0, max_brightness: float = 250.0, min_resolution: int = 60):
+def check_image_quality(image_path_or_bytes, min_blur_var: float = 5.0, min_brightness: float = 15.0, max_brightness: float = 245.0, min_resolution: int = 60):
     """
     Performs image quality validation:
     1. Blur Detection using OpenCV Laplacian Variance (Calibrated for mobile photos).

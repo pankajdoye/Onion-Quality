@@ -115,8 +115,15 @@ def call_gemini_vision(b64_img: str, mime_type: str = "image/jpeg") -> Optional[
 
     import requests
 
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.6-flash").strip()
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-flash-latest").strip()
+    if model_name.startswith("models/"):
+        model_name = model_name[7:]
+
+    candidate_models = [model_name]
+    for m in ["gemini-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash"]:
+        if m not in candidate_models:
+            candidate_models.append(m)
+
     payload = {
         "contents": [{
             "parts": [
@@ -136,22 +143,24 @@ def call_gemini_vision(b64_img: str, mime_type: str = "image/jpeg") -> Optional[
         }
     }
 
-    try:
-        resp = requests.post(url, json=payload, timeout=8)
-        if resp.status_code != 200:
-            logger.warning(f"Gemini Vision API status {resp.status_code}: {resp.text[:120]}")
-            return None
-        
-        result_json = resp.json()
-        candidates = result_json.get("candidates", [])
-        if not candidates:
-            return None
-        
-        text_content = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-        return _sanitize_vision_json(text_content)
-    except Exception as e:
-        logger.warning(f"Gemini Vision API call failed: {e}")
-        return None
+    for model in candidate_models:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+        try:
+            resp = requests.post(url, json=payload, timeout=15)
+            if resp.status_code == 200:
+                result_json = resp.json()
+                candidates = result_json.get("candidates", [])
+                if candidates:
+                    text_content = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                    sanitized = _sanitize_vision_json(text_content)
+                    if sanitized:
+                        return sanitized
+            else:
+                logger.warning(f"Gemini Vision model {model} returned status {resp.status_code}: {resp.text[:120]}")
+        except Exception as e:
+            logger.warning(f"Gemini API request failed for {model}: {e}")
+
+    return None
 
 def call_openai_vision(b64_img: str, mime_type: str = "image/jpeg") -> Optional[Dict[str, Any]]:
     """Calls OpenAI API (GPT-4o) via HTTPS using standard requests."""
