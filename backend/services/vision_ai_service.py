@@ -83,26 +83,20 @@ Rules for quality and grade:
 - If ambiguous or image unclear: set "needs_review": true.
 """
 
-def _encode_image_to_base64(image_path_or_bytes, max_dim: int = 640) -> Tuple[Optional[str], str]:
-    """Resizes and encodes image file or bytes into lightweight base64 string for Vision API."""
-    import io
-    from PIL import Image, ImageOps
+def _encode_image_to_base64(image_path_or_bytes) -> Tuple[Optional[str], str]:
+    """Encodes image file or bytes into base64 string and detects mime type."""
     try:
         if isinstance(image_path_or_bytes, (str, Path)):
             path = Path(image_path_or_bytes)
             if not path.exists():
                 return None, "image/jpeg"
-            pil_img = Image.open(path)
+            with open(path, "rb") as f:
+                data = f.read()
+            mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
+            return base64.b64encode(data).decode("utf-8"), mime
         elif isinstance(image_path_or_bytes, bytes):
-            pil_img = Image.open(io.BytesIO(image_path_or_bytes))
-        else:
-            return None, "image/jpeg"
-
-        pil_img = ImageOps.exif_transpose(pil_img).convert('RGB')
-        pil_img.thumbnail((max_dim, max_dim))
-        buf = io.BytesIO()
-        pil_img.save(buf, format='JPEG', quality=85)
-        return base64.b64encode(buf.getvalue()).decode('utf-8'), "image/jpeg"
+            mime = "image/png" if image_path_or_bytes.startswith(b'\x89PNG') else "image/jpeg"
+            return base64.b64encode(image_path_or_bytes).decode("utf-8"), mime
     except Exception as e:
         logger.warning(f"Error encoding image to base64: {e}")
     return None, "image/jpeg"
@@ -115,15 +109,7 @@ def call_gemini_vision(b64_img: str, mime_type: str = "image/jpeg") -> Optional[
 
     import requests
 
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-flash-latest").strip()
-    if model_name.startswith("models/"):
-        model_name = model_name[7:]
-
-    candidate_models = [model_name]
-    for m in ["gemini-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash"]:
-        if m not in candidate_models:
-            candidate_models.append(m)
-
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
     payload = {
         "contents": [{
             "parts": [
@@ -143,24 +129,22 @@ def call_gemini_vision(b64_img: str, mime_type: str = "image/jpeg") -> Optional[
         }
     }
 
-    for model in candidate_models:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-        try:
-            resp = requests.post(url, json=payload, timeout=15)
-            if resp.status_code == 200:
-                result_json = resp.json()
-                candidates = result_json.get("candidates", [])
-                if candidates:
-                    text_content = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-                    sanitized = _sanitize_vision_json(text_content)
-                    if sanitized:
-                        return sanitized
-            else:
-                logger.warning(f"Gemini Vision model {model} returned status {resp.status_code}: {resp.text[:120]}")
-        except Exception as e:
-            logger.warning(f"Gemini API request failed for {model}: {e}")
-
-    return None
+    try:
+        resp = requests.post(url, json=payload, timeout=8)
+        if resp.status_code != 200:
+            logger.warning(f"Gemini Vision API status {resp.status_code}: {resp.text[:120]}")
+            return None
+        
+        result_json = resp.json()
+        candidates = result_json.get("candidates", [])
+        if not candidates:
+            return None
+        
+        text_content = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+        return _sanitize_vision_json(text_content)
+    except Exception as e:
+        logger.warning(f"Gemini Vision API call failed: {e}")
+        return None
 
 def call_openai_vision(b64_img: str, mime_type: str = "image/jpeg") -> Optional[Dict[str, Any]]:
     """Calls OpenAI API (GPT-4o) via HTTPS using standard requests."""
