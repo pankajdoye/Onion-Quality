@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Menu, Sun, Moon, WifiOff, Server } from 'lucide-react';
 import Sidebar from './Sidebar';
 import BackendConfigModal from './BackendConfigModal';
