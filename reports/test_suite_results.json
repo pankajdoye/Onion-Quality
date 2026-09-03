@@ -8,22 +8,58 @@
       "status": "success",
       "stage": 2,
       "is_onion": true,
-      "onion_confidence": 0.7523,
+      "onion_confidence": 0.752,
       "quality_confidence": 0.94,
-      "quality_score": 58.7,
-      "quality_condition": "Defective",
+      "is_uncertain": false,
+      "overall_quality": "GOOD",
+      "quality_score": 96.0,
+      "quality_condition": "Healthy",
       "is_single_onion": true,
       "detected_onions_count": 1,
+      "individual_onions": [
+        {
+          "onion_id": 1,
+          "bbox": [
+            163.0,
+            87.0,
+            670.0,
+            642.0
+          ],
+          "bbox_norm": [
+            15.9,
+            11.3,
+            49.5,
+            72.3
+          ],
+          "confidence": 0.752,
+          "grade": "GOOD",
+          "assigned_grade": "GRADE A",
+          "damage": "Not Detected",
+          "rot": "Not Detected",
+          "sprouting": "Not Detected",
+          "crack": "Not Detected",
+          "discoloration": "Not Detected",
+          "undersized": false,
+          "diameter_mm": 67,
+          "defects": []
+        }
+      ],
       "single_onion_notice": "Single-onion analysis cannot represent the quality of your entire batch. For better batch estimation, photograph multiple onions.",
-      "grade_a": 40,
-      "grade_b": 42,
-      "urs": 18,
-      "damaged": 8.0,
-      "rotten": 4.0,
-      "sprouted": 2.0,
-      "undersized": 5,
-      "average_diameter": 68,
-      "average_weight": 85,
+      "grade_a": 100,
+      "grade_b": 0,
+      "urs": 0,
+      "grade_a_count": 1,
+      "urs_count": 0,
+      "grade_a_percentage": 100.0,
+      "urs_percentage": 0.0,
+      "healthy": 1,
+      "damaged": 0.0,
+      "rotten": 0.0,
+      "sprouted": 0.0,
+      "undersized": 0.0,
+      "average_diameter": 67,
+      "average_weight": 83,
+      "vision_ai_status": "Vision AI disabled. Local quality model active.",
       "message": "Onion detected successfully."
     }
   },
@@ -38,35 +74,132 @@
       "is_onion": true,
       "onion_confidence": 1.0,
       "quality_confidence": 0.94,
-      "quality_score": 92.0,
-      "quality_condition": "Healthy",
+      "is_uncertain": false,
+      "overall_quality": "AVERAGE",
+      "quality_score": 68.0,
+      "quality_condition": "Average",
       "is_single_onion": true,
       "detected_onions_count": 1,
+      "individual_onions": [
+        {
+          "onion_id": 1,
+          "bbox": [
+            17.0,
+            17.0,
+            238.0,
+            238.0
+          ],
+          "bbox_norm": [
+            6.6,
+            6.6,
+            86.3,
+            86.3
+          ],
+          "confidence": 1.0,
+          "grade": "AVERAGE",
+          "assigned_grade": "URS",
+          "damage": "Not Detected",
+          "rot": "Not Detected",
+          "sprouting": "Detected",
+          "crack": "Not Detected",
+          "discoloration": "Detected",
+          "undersized": false,
+          "diameter_mm": 85,
+          "defects": [
+            {
+              "type": "sprouting",
+              "severity": "medium",
+              "label": "Green Sprout"
+            },
+            {
+              "type": "discoloration",
+              "severity": "low",
+              "label": "Discoloration"
+            }
+          ]
+        }
+      ],
       "single_onion_notice": "Single-onion analysis cannot represent the quality of your entire batch. For better batch estimation, photograph multiple onions.",
-      "grade_a": 78,
-      "grade_b": 16,
-      "urs": 6,
-      "damaged": 4.0,
-      "rotten": 1.0,
-      "sprouted": 1.0,
-      "undersized": 5,
-      "average_diameter": 68,
-      "average_weight": 85,
+      "grade_a": 0,
+      "grade_b": 0,
+      "urs": 100,
+      "grade_a_count": 0,
+      "urs_count": 1,
+      "grade_a_percentage": 0.0,
+      "urs_percentage": 100.0,
+      "healthy": 0,
+      "damaged": 0.0,
+      "rotten": 0.0,
+      "sprouted": 100.0,
+      "undersized": 0.0,
+      "average_diameter": 85,
+      "average_weight": 106,
+      "vision_ai_status": "Vision AI disabled. Local quality model active.",
       "message": "Onion detected successfully."
     }
   },
   {
     "test_id": "Test C",
     "name": "Defective / Rotting Onion",
-    "expected": "Detected / Defective",
+    "expected": "Detected",
     "status": "PASSED",
     "result": {
-      "status": "rejected",
-      "stage": 1,
-      "is_onion": false,
-      "onion_confidence": 0.1897,
-      "rejection_reason": "not_an_onion",
-      "message": "Please capture a clear photo of the onion."
+      "status": "success",
+      "stage": 2,
+      "is_onion": true,
+      "onion_confidence": 0.85,
+      "quality_confidence": 0.94,
+      "is_uncertain": false,
+      "overall_quality": "GOOD",
+      "quality_score": 96.0,
+      "quality_condition": "Healthy",
+      "is_single_onion": true,
+      "detected_onions_count": 1,
+      "individual_onions": [
+        {
+          "onion_id": 1,
+          "bbox": [
+            69.0,
+            52.0,
+            954.0,
+            715.0
+          ],
+          "bbox_norm": [
+            6.7,
+            6.8,
+            86.4,
+            86.3
+          ],
+          "confidence": 0.85,
+          "grade": "GOOD",
+          "assigned_grade": "GRADE A",
+          "damage": "Not Detected",
+          "rot": "Not Detected",
+          "sprouting": "Not Detected",
+          "crack": "Not Detected",
+          "discoloration": "Not Detected",
+          "undersized": false,
+          "diameter_mm": 85,
+          "defects": []
+        }
+      ],
+      "single_onion_notice": "Single-onion analysis cannot represent the quality of your entire batch. For better batch estimation, photograph multiple onions.",
+      "grade_a": 100,
+      "grade_b": 0,
+      "urs": 0,
+      "grade_a_count": 1,
+      "urs_count": 0,
+      "grade_a_percentage": 100.0,
+      "urs_percentage": 0.0,
+      "healthy": 1,
+      "damaged": 0.0,
+      "rotten": 0.0,
+      "sprouted": 0.0,
+      "undersized": 0.0,
+      "average_diameter": 85,
+      "average_weight": 106,
+      "vision_ai_status": "Vision AI disabled. Local quality model active.",
+      "message": "Onion detected successfully."
     }
   },
   {
@@ -80,7 +213,7 @@
       "is_onion": false,
       "onion_confidence": 0.148,
       "rejection_reason": "not_an_onion",
-      "message": "Please capture a clear photo of the onion."
+      "message": "Onion not detected. Please capture a clear onion image."
     }
   },
   {
@@ -94,7 +227,7 @@
       "is_onion": false,
       "onion_confidence": 0.1897,
       "rejection_reason": "not_an_onion",
-      "message": "Please capture a clear photo of the onion."
+      "message": "Onion not detected. Please capture a clear onion image."
     }
   },
   {
@@ -108,7 +241,7 @@
       "is_onion": false,
       "onion_confidence": 0.1906,
       "rejection_reason": "not_an_onion",
-      "message": "Please capture a clear photo of the onion."
+      "message": "Onion not detected. Please capture a clear onion image."
     }
   },
   {
@@ -122,7 +255,7 @@
       "is_onion": false,
       "onion_confidence": 0.1858,
       "rejection_reason": "not_an_onion",
-      "message": "Please capture a clear photo of the onion."
+      "message": "Onion not detected. Please capture a clear onion image."
     }
   },
   {
@@ -136,7 +269,7 @@
       "is_onion": false,
       "onion_confidence": 0.1705,
       "rejection_reason": "not_an_onion",
-      "message": "Please capture a clear photo of the onion."
+      "message": "Onion not detected. Please capture a clear onion image."
     }
   },
   {
@@ -150,7 +283,7 @@
       "is_onion": false,
       "onion_confidence": 0.1223,
       "rejection_reason": "not_an_onion",
-      "message": "Please capture a clear photo of the onion."
+      "message": "Onion not detected. Please capture a clear onion image."
     }
   },
   {
@@ -164,7 +297,7 @@
       "is_onion": false,
       "onion_confidence": 0.1323,
       "rejection_reason": "not_an_onion",
-      "message": "Please capture a clear photo of the onion."
+      "message": "Onion not detected. Please capture a clear onion image."
     }
   }
 ]

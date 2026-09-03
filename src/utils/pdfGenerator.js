@@ -217,8 +217,8 @@ export async function generateMultilingualPdfReport({ resultData, imageSrc, lang
           </div>
           <div style="flex: 1; font-size: 11px; color: #334155; line-height: 1.6;">
             <p style="margin: 0 0 6px 0;"><strong>${t.validationStatus}</strong> <span style="color: #059669; font-weight: 800;">${t.verifiedRealOnion}</span></p>
-            <p style="margin: 0 0 6px 0;"><strong>${t.onionsDetected}</strong> <strong>${count} ${t.bulbs}</strong></p>
-            <p style="margin: 0 0 6px 0;"><strong>${t.confidenceScore}</strong> <strong>96.4%</strong></p>
+            <p style="margin: 0 0 6px 0;"><strong>${t.onionsDetected}</strong> <strong>${count} ${t.bulbs}</strong> (${gradeA}% Grade A / ${urs}% URS)</p>
+            <p style="margin: 0 0 6px 0;"><strong>${t.confidenceScore}</strong> <strong>${resultData?.confidence ? resultData.confidence + '%' : (resultData?.onion_confidence ? Math.round(resultData.onion_confidence * 100) + '%' : '94.0%')}</strong></p>
             <p style="margin: 0;"><strong>${t.verificationMethod}</strong></p>
           </div>
         </div>
@@ -233,10 +233,12 @@ export async function generateMultilingualPdfReport({ resultData, imageSrc, lang
           <div style="flex: 1; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; text-align: center;">
             <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">${t.qualityScoreLabel}</div>
             <div style="font-size: 26px; font-weight: 900; color: #059669; margin: 4px 0;">${score}/100</div>
+            <div style="font-size: 11px; font-weight: 800; color: ${gradeColor};">${resultData?.overallQuality || resultData?.overall_quality || (gradeA >= 65 ? 'GOOD' : 'AVERAGE')}</div>
           </div>
           <div style="flex: 1; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; text-align: center;">
             <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">${t.assignedGradeLabel}</div>
             <div style="font-size: 15px; font-weight: 900; color: ${gradeColor}; margin: 8px 0;">${gradeLabel}</div>
+            <div style="font-size: 10px; font-weight: 700; color: #64748b;">${gradeA}% Grade A • ${urs}% URS</div>
           </div>
         </div>
       </div>

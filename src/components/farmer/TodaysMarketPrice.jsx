@@ -27,7 +27,7 @@ export default function TodaysMarketPrice({ lang = 'en' }) {
       max: "कमाल भाव",
       perQuintal: "प्रति क्विंटल",
       updated: "शेवटचे अपडेट:",
-      unavailable: "Sangli APMC market rate unavailable."
+      unavailable: "बाजारभाव उपलब्ध नाही (Market rate unavailable.)"
     },
     hi: {
       header: "आधिकारिक प्याज मंडी भाव",
@@ -39,7 +39,7 @@ export default function TodaysMarketPrice({ lang = 'en' }) {
       max: "अधिकतम भाव",
       perQuintal: "प्रति क्विंटल",
       updated: "अंतिम अपडेट:",
-      unavailable: "Sangli APMC market rate unavailable."
+      unavailable: "मंडी भाव उपलब्ध नहीं है (Market rate unavailable.)"
     },
     en: {
       header: "Latest Official Onion Rate",
@@ -51,7 +51,7 @@ export default function TodaysMarketPrice({ lang = 'en' }) {
       max: "Maximum",
       perQuintal: "per quintal",
       updated: "Last Updated:",
-      unavailable: "Sangli APMC market rate unavailable."
+      unavailable: "Market rate unavailable."
     }
   };
 

@@ -13,7 +13,7 @@ export default function OneTapCheck({ onImageSelected, onPresetTestSelected, lan
 
     const reader = new FileReader();
     reader.onload = (evt) => {
-      onImageSelected(evt.target.result);
+      onImageSelected(evt.target.result, file);
     };
     reader.readAsDataURL(file);
   };

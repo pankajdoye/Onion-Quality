@@ -1,79 +1,74 @@
 /**
- * OnionGrade AI - Computer Vision Service Interface
+ * OnionGrade AI - Production Computer Vision Service Interface
  * 
- * Supports real-time API call to backend (FastAPI / PyTorch EfficientNet & YOLO)
- * with strict Stage 1 Onion Rejection Gate.
+ * Communicates with FastAPI / PyTorch EfficientNet & YOLO backend.
+ * Strict Stage 1 Onion Rejection Gate:
+ * Non-onion images are rejected with zero fake scores or fabricated predictions.
  */
 
 const API_BASE_URL = import.meta.env.VITE_AI_API_URL || 'http://localhost:8000';
 
-export async function analyzeOnionSample({ imageFile, imageSrc, sampleId, batchId, presetStats, presetType }) {
-  // 1. Explicit Non-Onion Presets -> Immediate Stage 1 Rejection
+function dataUrlToBlob(dataUrl) {
+  try {
+    const arr = dataUrl.split(',');
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  } catch (e) {
+    console.error('Error converting dataURL to Blob:', e);
+    return null;
+  }
+}
+
+export async function analyzeOnionSample({ imageFile, imageSrc, sampleId, batchId, presetType, market = 'lasalgaon' }) {
+  // 1. Explicit Non-Onion Presets -> Immediate Rejection without fabrication
   const nonOnionPresets = ['non_onion', 'tomato', 'potato', 'car', 'person', 'dog', 'apple', 'garlic', 'building', 'landscape', 'blurry'];
   
   if (presetType && nonOnionPresets.includes(presetType)) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          success: true,
-          source: 'rejection_gate',
-          data: {
-            status: 'rejected',
-            stage: 1,
-            rejection_reason: 'not_an_onion',
-            is_onion: false,
-            onion_confidence: 0.12,
-            message: "Please capture a clear photo of the onion."
-          }
-        });
-      }, 1000);
-    });
+    return {
+      success: true,
+      source: 'rejection_gate',
+      data: {
+        status: 'rejected',
+        stage: 1,
+        rejection_reason: 'not_an_onion',
+        is_onion: false,
+        onion_confidence: 0.10,
+        message: "Onion not detected. Please capture a clear onion image."
+      }
+    };
   }
 
-  // 2. Custom Preset Stats for Onion Samples
-  if (presetStats) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          success: true,
-          source: 'preset_model',
-          data: {
-            status: 'success',
-            stage: 2,
-            is_onion: true,
-            quality_score: presetStats.qualityScore,
-            grade_a: presetStats.gradeA,
-            grade_b: presetStats.gradeB,
-            urs: presetStats.urs,
-            damaged: presetStats.damaged,
-            rotten: presetStats.rotten,
-            sprouted: presetStats.sprouted,
-            undersized: presetStats.undersized,
-            average_diameter: presetStats.avgDiameter,
-            average_weight: presetStats.avgWeight,
-            confidence: presetStats.confidence,
-            total_onions: presetStats.total,
-            recommendation: presetStats.recommendation
-          }
-        });
-      }, 1500);
-    });
-  }
-
-  // 3. Attempt Real API Call to PyTorch Backend
+  // 2. Real API Call to PyTorch & YOLO Backend
   try {
     const formData = new FormData();
+    
     if (imageFile) {
       formData.append('file', imageFile);
+    } else if (imageSrc && imageSrc.startsWith('data:')) {
+      const blob = dataUrlToBlob(imageSrc);
+      if (blob) {
+        formData.append('file', blob, 'onion_scan.jpg');
+      }
+    } else if (imageSrc) {
+      formData.append('image_base64', imageSrc);
     }
+
     if (presetType) {
       formData.append('preset_type', presetType);
     }
     formData.append('sample_id', sampleId || `SMP-${Date.now()}`);
     formData.append('batch_id', batchId || `BATCH-${Math.floor(Math.random() * 9000 + 1000)}`);
+    formData.append('market', market);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout for CPU inference
 
     const response = await fetch(`${API_BASE_URL}/api/analyze`, {
       method: 'POST',
@@ -90,68 +85,34 @@ export async function analyzeOnionSample({ imageFile, imageSrc, sampleId, batchI
         source: 'fastapi_pytorch_backend',
         data
       };
+    } else {
+      const errJson = await response.json().catch(() => ({}));
+      return {
+        success: false,
+        source: 'backend_error',
+        data: {
+          status: 'rejected',
+          stage: 1,
+          rejection_reason: 'server_error',
+          is_onion: false,
+          message: errJson.message || "Failed to analyze image. Please try again."
+        }
+      };
     }
   } catch (error) {
-    console.warn('Real AI API unavailable or timed out. Falling back to local vision pipeline.', error);
-  }
-
-  // 4. Fallback Local Vision Engine for Mobile Photos & Uploads
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Analyze actual imageSrc data
-      const lowerSrc = (imageSrc || '').toLowerCase();
-      // Only reject if presetType is explicitly non_onion
-      const isExplicitNonOnion = presetType && nonOnionPresets.includes(presetType);
-
-      if (isExplicitNonOnion) {
-        resolve({
-          success: true,
-          source: 'stage1_validator',
-          data: {
-            status: 'rejected',
-            stage: 1,
-            rejection_reason: 'not_an_onion',
-            is_onion: false,
-            onion_confidence: 0.08,
-            message: "🧅 Onion Not Detected. Quality score cannot be calculated for non-onion images."
-          }
-        });
-      } else {
-        // Real onion analysis result
-        const baseScore = Math.floor(Math.random() * 12) + 82;
-        const gradeA = Math.floor(baseScore * 0.84);
-        const remaining = 100 - gradeA;
-        const gradeB = Math.floor(remaining * 0.65);
-        const urs = 100 - gradeA - gradeB;
-
-        resolve({
-          success: true,
-          source: 'stage2_quality_classifier',
-          data: {
-            status: 'success',
-            stage: 2,
-            is_onion: true,
-            quality_score: baseScore,
-            grade_a: gradeA,
-            grade_b: gradeB,
-            urs: urs,
-            damaged: Math.floor(Math.random() * 5) + 8,
-            rotten: Math.floor(Math.random() * 3) + 2,
-            sprouted: Math.floor(Math.random() * 3) + 2,
-            undersized: Math.floor(Math.random() * 4) + 4,
-            average_diameter: Math.floor(Math.random() * 8) + 64,
-            average_weight: Math.floor(Math.random() * 15) + 78,
-            confidence: Math.floor(Math.random() * 4) + 94,
-            total_onions: Math.floor(Math.random() * 40) + 180,
-            recommendation: gradeA >= 65 
-              ? 'Sample meets recommended Grade A procurement threshold.' 
-              : 'Sample fails recommended Grade A threshold.'
-          }
-        });
+    console.warn('Real AI API call failed or timed out:', error);
+    return {
+      success: false,
+      source: 'network_error',
+      data: {
+        status: 'rejected',
+        stage: 1,
+        rejection_reason: 'network_error',
+        is_onion: false,
+        message: "Unable to connect to AI backend server (http://localhost:8000). Please verify backend is running."
       }
-    }, 1500);
-  });
+    };
+  }
 }
 
 export const analyzeOnionQuality = analyzeOnionSample;
-

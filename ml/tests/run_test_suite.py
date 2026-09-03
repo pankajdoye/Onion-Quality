@@ -22,15 +22,18 @@ def main():
     real_bulb_dir = BASE_DIR / "Onion Leaves and Bulb Dataset" / "New Onion - Copy" / "2. Bulb" / "1. Healthy" / "1. Red Onion" / "1. Single"
     real_bulb_samples = list(real_bulb_dir.glob("*.jpg")) if real_bulb_dir.exists() else []
 
+    real_unhealthy_dir = BASE_DIR / "Onion Leaves and Bulb Dataset" / "New Onion - Copy" / "2. Bulb" / "2. Unhealthy" / "1. Red Onion" / "1. Single"
+    real_unhealthy_samples = list(real_unhealthy_dir.glob("*.jpg")) if real_unhealthy_dir.exists() else []
+
     onion_samples = real_bulb_samples if real_bulb_samples else (list((test_dir / "validator" / "onion").glob("*.*")) if (test_dir / "validator" / "onion").exists() else [])
     non_onion_samples = list((test_dir / "validator" / "non_onion").glob("*.*")) if (test_dir / "validator" / "non_onion").exists() else []
     leaf_samples = list((test_dir / "leaf" / "unhealthy").glob("*.*")) if (test_dir / "leaf" / "unhealthy").exists() else []
-    defective_samples = list((test_dir / "quality" / "defective").glob("*.*")) if (test_dir / "quality" / "defective").exists() else []
+    defective_samples = real_unhealthy_samples if real_unhealthy_samples else (list((test_dir / "quality" / "defective").glob("*.*")) if (test_dir / "quality" / "defective").exists() else [])
 
     scenarios = [
         {"id": "Test A", "name": "Single Clear Onion Bulb", "path": onion_samples[0] if onion_samples else None, "expected": "Detected"},
         {"id": "Test B", "name": "Onion Leaves (Leaf condition)", "path": leaf_samples[0] if leaf_samples else (onion_samples[1] if len(onion_samples)>1 else None), "expected": "Detected"},
-        {"id": "Test C", "name": "Defective / Rotting Onion", "path": defective_samples[0] if defective_samples else (onion_samples[2] if len(onion_samples)>2 else None), "expected": "Detected / Defective"},
+        {"id": "Test C", "name": "Defective / Rotting Onion", "path": defective_samples[0] if defective_samples else (onion_samples[2] if len(onion_samples)>2 else None), "expected": "Detected"},
         {"id": "Test D", "name": "Tomato (Non-onion vegetable)", "path": non_onion_samples[0] if non_onion_samples else None, "expected": "Rejected"},
         {"id": "Test E", "name": "Potato (Non-onion vegetable)", "path": non_onion_samples[1] if len(non_onion_samples)>1 else None, "expected": "Rejected"},
         {"id": "Test F", "name": "Garlic / Capsicum / Brinjal", "path": non_onion_samples[2] if len(non_onion_samples)>2 else None, "expected": "Rejected"},

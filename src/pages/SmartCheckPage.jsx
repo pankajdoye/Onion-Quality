@@ -6,6 +6,7 @@ import InteractiveImageResult from '../components/farmer/InteractiveImageResult'
 import StorageAdviceCard from '../components/farmer/StorageAdviceCard';
 import SimpleProfitCalculator from '../components/farmer/ProfitCalculator';
 import ImageRejectionCard from '../components/farmer/ImageRejectionCard';
+import BlurDarknessAlertCard from '../components/farmer/BlurDarknessAlertCard';
 import LowConfidenceCard from '../components/farmer/LowConfidenceCard';
 import SingleOnionNotice from '../components/farmer/SingleOnionNotice';
 import ProcessingState from '../components/assessment/ProcessingState';
@@ -21,22 +22,23 @@ export default function SmartCheckPage({ lang = 'en' }) {
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const t = SMART_I18N[lang] || SMART_I18N.en;
 
-  const handleImageSelected = async (imageSrc, presetType = null) => {
+  const handleImageSelected = async (imageSrc, presetType = null, imageFile = null) => {
     setSelectedImage(imageSrc);
     setIsAnalyzing(true);
     setAnalysisResult(null);
 
     const result = await analyzeOnionQuality({
+      imageFile,
       imageSrc,
       presetType
     });
 
     setIsAnalyzing(false);
 
-    if (result && result.success) {
+    if (result && result.data) {
       setAnalysisResult(result.data);
 
-      if (result.data && result.data.is_onion) {
+      if (result.data.status === 'success' && result.data.is_onion) {
         saveScanRecord({
           ...result.data,
           imageSrc,
@@ -55,7 +57,7 @@ export default function SmartCheckPage({ lang = 'en' }) {
         rejection_reason: "not_an_onion",
         is_onion: false,
         onion_confidence: 0.10,
-        message: "Please capture a clear photo of the onion."
+        message: "Onion not detected. Please capture a clear onion image."
       });
     }
   };
@@ -116,13 +118,13 @@ export default function SmartCheckPage({ lang = 'en' }) {
       {/* Upload & Live Camera Zone */}
       {!analysisResult && !isAnalyzing && (
         <OneTapCheck
-          onImageSelected={(img) => handleImageSelected(img, null)}
-          onPresetTestSelected={(preset, img) => handleImageSelected(img, preset)}
+          onImageSelected={(img, file) => handleImageSelected(img, null, file)}
+          onPresetTestSelected={(preset, img) => handleImageSelected(img, preset, null)}
           lang={lang}
         />
       )}
 
-      {/* Scanning Radar Animation */}
+      {/* Scanning Animation */}
       {isAnalyzing && (
         <ProcessingState sampleImage={selectedImage} />
       )}
@@ -131,26 +133,36 @@ export default function SmartCheckPage({ lang = 'en' }) {
       {analysisResult && !isAnalyzing && (
         <div id="smart-result-view" className="space-y-6 animate-in fade-in duration-300">
           
+          {/* IMAGE QUALITY INSUFFICIENT ALERT */}
+          {analysisResult.status === 'low_quality' && (
+            <BlurDarknessAlertCard
+              message={analysisResult.message}
+              onRetake={handleReset}
+              lang={lang}
+            />
+          )}
+
           {/* STAGE 1 REJECTION: INVALID / NON-ONION IMAGE */}
           {(analysisResult.status === 'rejected' || !analysisResult.is_onion) && (
             <ImageRejectionCard
+              message={analysisResult.message}
               onRetryCamera={handleReset}
               onRetryUpload={handleReset}
               lang={lang}
             />
           )}
 
-          {/* LOW CONFIDENCE UNCERTAIN RESULT */}
+          {/* LOW CONFIDENCE / UNCERTAIN RESULT */}
           {analysisResult.status === 'success' && analysisResult.is_onion && analysisResult.is_uncertain && (
-            <LowConfidenceCard onRetry={handleReset} />
+            <LowConfidenceCard onRetry={handleReset} lang={lang} />
           )}
 
-          {/* SINGLE ONION BATCH WARNING NOTICE */}
+          {/* SINGLE ONION NOTICE */}
           {analysisResult.status === 'success' && analysisResult.is_onion && !analysisResult.is_uncertain && analysisResult.is_single_onion && (
             <SingleOnionNotice lang={lang} />
           )}
 
-          {/* STAGE 2 PASSED: FULL QUALITY RESULTS FOR VALID ONIONS ONLY */}
+          {/* STAGE 2 PASSED: FULL QUALITY RESULTS FOR VALID ONIONS */}
           {analysisResult.status === 'success' && analysisResult.is_onion && !analysisResult.is_uncertain && (
             <>
               {/* Action Bar with Multilingual PDF Download Button */}
@@ -174,25 +186,38 @@ export default function SmartCheckPage({ lang = 'en' }) {
                 </button>
               </div>
 
+              {/* Main Summary Result Card with Grade A & URS Totals */}
               <TopResultCard
                 resultData={{
                   quality_score: analysisResult.quality_score,
+                  overall_quality: analysisResult.overall_quality,
+                  total_onions: analysisResult.detected_onions_count,
+                  detected_onions_count: analysisResult.detected_onions_count,
                   grade_a: analysisResult.grade_a,
                   grade_b: analysisResult.grade_b,
                   urs: analysisResult.urs,
+                  grade_a_count: analysisResult.grade_a_count,
+                  urs_count: analysisResult.urs_count,
                   healthy: analysisResult.healthy,
                   damaged: analysisResult.damaged,
                   rotten: analysisResult.rotten,
                   sprouted: analysisResult.sprouted,
                   undersized: analysisResult.undersized,
-                  expected_price: analysisResult.expected_price_formatted || '₹2,600 / quintal',
-                  best_market: analysisResult.best_market || 'Lasalgaon APMC',
-                  selling_advice: analysisResult.selling_advice || 'Prices are currently rising'
+                  expected_price: analysisResult.estimated_price_range || '₹2,600 / quintal',
+                  best_market: analysisResult.market || 'Lasalgaon APMC',
+                  selling_advice: analysisResult.selling_recommendation || 'Prices are currently stable',
+                  vision_ai_status: analysisResult.vision_ai_status
                 }}
                 lang={lang}
               />
 
-              <InteractiveImageResult sampleImage={selectedImage} lang={lang} />
+              {/* Interactive Image with Detected Bounding Boxes and Individual Onion List */}
+              <InteractiveImageResult
+                sampleImage={selectedImage}
+                individualOnions={analysisResult.individual_onions || []}
+                lang={lang}
+              />
+
               <StorageAdviceCard qualityScore={analysisResult.quality_score} lang={lang} />
               <SimpleProfitCalculator expectedPricePerQuintal={2600} lang={lang} />
             </>
