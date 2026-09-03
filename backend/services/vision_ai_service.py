@@ -83,20 +83,26 @@ Rules for quality and grade:
 - If ambiguous or image unclear: set "needs_review": true.
 """
 
-def _encode_image_to_base64(image_path_or_bytes) -> Tuple[Optional[str], str]:
-    """Encodes image file or bytes into base64 string and detects mime type."""
+def _encode_image_to_base64(image_path_or_bytes, max_dim: int = 640) -> Tuple[Optional[str], str]:
+    """Resizes and encodes image file or bytes into lightweight base64 string for Vision API."""
+    import io
+    from PIL import Image, ImageOps
     try:
         if isinstance(image_path_or_bytes, (str, Path)):
             path = Path(image_path_or_bytes)
             if not path.exists():
                 return None, "image/jpeg"
-            with open(path, "rb") as f:
-                data = f.read()
-            mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
-            return base64.b64encode(data).decode("utf-8"), mime
+            pil_img = Image.open(path)
         elif isinstance(image_path_or_bytes, bytes):
-            mime = "image/png" if image_path_or_bytes.startswith(b'\x89PNG') else "image/jpeg"
-            return base64.b64encode(image_path_or_bytes).decode("utf-8"), mime
+            pil_img = Image.open(io.BytesIO(image_path_or_bytes))
+        else:
+            return None, "image/jpeg"
+
+        pil_img = ImageOps.exif_transpose(pil_img).convert('RGB')
+        pil_img.thumbnail((max_dim, max_dim))
+        buf = io.BytesIO()
+        pil_img.save(buf, format='JPEG', quality=85)
+        return base64.b64encode(buf.getvalue()).decode('utf-8'), "image/jpeg"
     except Exception as e:
         logger.warning(f"Error encoding image to base64: {e}")
     return None, "image/jpeg"
@@ -109,7 +115,8 @@ def call_gemini_vision(b64_img: str, mime_type: str = "image/jpeg") -> Optional[
 
     import requests
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.6-flash").strip()
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
     payload = {
         "contents": [{
             "parts": [

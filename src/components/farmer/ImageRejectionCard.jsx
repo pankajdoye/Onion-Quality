@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle, Camera, Upload } from 'lucide-react';
 
-export default function ImageRejectionCard({ onRetryCamera, onRetryUpload, lang = 'en' }) {
+export default function ImageRejectionCard({ message, onRetryCamera, onRetryUpload, lang = 'en' }) {
   const content = {
     mr: {
       title: "प्रतिमा योग्य नाही",
@@ -39,7 +39,7 @@ export default function ImageRejectionCard({ onRetryCamera, onRetryUpload, lang 
         </h2>
 
         <p className="text-base font-semibold text-[#263238] dark:text-[#F5F7FA] max-w-md mx-auto leading-relaxed">
-          {c.msg}
+          {message || c.msg}
         </p>
       </div>
 
