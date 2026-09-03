@@ -10,6 +10,12 @@ from backend.database import init_db, get_db, SampleRecord
 from backend.services.price_service import calculate_price_estimate, get_best_selling_recommendation, load_market_data
 from backend.services.vision_service import process_image_analysis
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass
+
 app = FastAPI(
     title="Smart Onion AI Two-Stage API Backend",
     description="Production-Grade Two-Stage AI Validation, Multi-Bulb Quality Grading & Market Decision Support",
