@@ -201,10 +201,10 @@ class OnionAIEngine:
 
         onion_detected_boxes = []
         bulb_candidate_boxes = []
-        non_onion_dominant_boxes = []
+        non_bulb_boxes = []
         if self.yolo_model is not None and cv_img is not None:
             try:
-                yolo_res = self.yolo_model(cv_img, conf=0.10, verbose=False)[0]
+                yolo_res = self.yolo_model(cv_img, conf=0.08, verbose=False)[0]
                 for b in yolo_res.boxes:
                     cls_id = int(b.cls[0])
                     cls_name = self.yolo_model.names[cls_id]
@@ -212,28 +212,31 @@ class OnionAIEngine:
                     xyxy = b.xyxy[0].tolist()
                     
                     is_onion_class = 'onion' in cls_name.lower()
-                    is_round_produce = any(k in cls_name.lower() for k in ['capsicum', 'brinjal', 'potato'])
-                    is_distinct_non_onion = any(k in cls_name.lower() for k in ['tomato', 'bitter_gourd', 'pointed_gourd'])
+                    is_round_produce = any(k in cls_name.lower() for k in ['brinjal', 'potato'])
+                    is_non_bulb = any(k in cls_name.lower() for k in ['tomato', 'bitter_gourd', 'pointed_gourd', 'capsicum'])
                     
                     box_w = xyxy[2] - xyxy[0]
                     box_h = xyxy[3] - xyxy[1]
                     aspect_ratio = box_w / max(1, box_h)
                     
-                    if is_onion_class and conf >= 0.10:
+                    if is_onion_class and conf >= 0.08:
                         onion_detected_boxes.append((conf, xyxy, cls_name))
-                    elif is_round_produce and conf >= 0.15 and (0.45 <= aspect_ratio <= 2.2):
+                    elif is_round_produce and conf >= 0.10 and (0.40 <= aspect_ratio <= 2.5):
                         bulb_candidate_boxes.append((conf, xyxy, cls_name))
-                    elif is_distinct_non_onion and conf >= 0.60:
-                        non_onion_dominant_boxes.append((conf, xyxy, cls_name))
+                    elif is_non_bulb and conf >= 0.60:
+                        non_bulb_boxes.append((conf, xyxy, cls_name))
             except Exception as e:
                 print(f"YOLO error: {e}")
 
-        # Robust Onion Verification Gate (supports phone photos, close-ups, and multi-bulb overviews)
-        has_yolo_onion = len(onion_detected_boxes) > 0 and max([c for c, _, _ in onion_detected_boxes]) >= 0.12
-        is_onion_valid = (validator_prob >= 0.22) or has_yolo_onion
+        # Robust Onion Verification Gate (supports real phone photos, close-ups, and multi-bulb overviews)
+        has_onion_detection = len(onion_detected_boxes) > 0
+        has_bulb_detection = len(bulb_candidate_boxes) > 0
+        has_validator_onion = (validator_prob >= 0.16)
 
-        # Reject if clear non-onion produce (e.g. tomato, bitter gourd, capsicum) dominates with no onion detection
-        if not has_yolo_onion and len(non_onion_dominant_boxes) > 0 and validator_prob < 0.25:
+        is_onion_valid = has_onion_detection or has_bulb_detection or has_validator_onion
+
+        # Reject if clear non-bulb produce (e.g. tomato, bitter gourd, capsicum) dominates with no onion detection
+        if not has_onion_detection and len(non_bulb_boxes) > 0 and validator_prob < 0.22:
             is_onion_valid = False
 
         # If verified as an onion scene, pool all candidate bulb boxes:
@@ -346,10 +349,14 @@ class OnionAIEngine:
             if is_undersized:
                 visible_defects.append({"type": "undersized", "severity": "low", "label": "Undersized (<45mm)"})
 
+            yolo_has_defect = "defected" in cls_name.lower()
+            if yolo_has_defect and not visible_defects:
+                visible_defects.append({"type": "blemish", "severity": "medium", "label": "Surface Defect / Blemish"})
+
             # Base Local Quality & Grade Assignment
             # A clearly rotten or severely damaged onion MUST NOT be marked GOOD.
             has_severe_defect = (rot == "Detected") or (damage == "Severe")
-            has_minor_defect = (damage == "Minor") or (sprouting == "Detected") or (crack == "Detected") or (discoloration == "Detected") or is_undersized
+            has_minor_defect = (damage == "Minor") or (sprouting == "Detected") or (crack == "Detected") or (discoloration == "Detected") or is_undersized or yolo_has_defect
 
             if has_severe_defect:
                 local_quality = "POOR"
