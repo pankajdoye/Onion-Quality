@@ -83,28 +83,34 @@ Rules for quality and grade:
 - If ambiguous or image unclear: set "needs_review": true.
 """
 
-def _encode_image_to_base64(image_path_or_bytes) -> Tuple[Optional[str], str]:
-    """Encodes image file or bytes into base64 string and detects mime type."""
+def _encode_image_to_base64(image_path_or_bytes, max_dim: int = 512) -> Tuple[Optional[str], str]:
+    """Encodes and downscales image into lightweight base64 string for fast Vision API call."""
+    import io
+    from PIL import Image, ImageOps
     try:
         if isinstance(image_path_or_bytes, (str, Path)):
-            path = Path(image_path_or_bytes)
-            if not path.exists():
-                return None, "image/jpeg"
-            with open(path, "rb") as f:
-                data = f.read()
-            mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
-            return base64.b64encode(data).decode("utf-8"), mime
+            pil_img = Image.open(str(image_path_or_bytes))
         elif isinstance(image_path_or_bytes, bytes):
-            mime = "image/png" if image_path_or_bytes.startswith(b'\x89PNG') else "image/jpeg"
-            return base64.b64encode(image_path_or_bytes).decode("utf-8"), mime
+            pil_img = Image.open(io.BytesIO(image_path_or_bytes))
+        else:
+            return None, "image/jpeg"
+
+        pil_img = ImageOps.exif_transpose(pil_img).convert('RGB')
+        pil_img.thumbnail((max_dim, max_dim))
+        buf = io.BytesIO()
+        pil_img.save(buf, format='JPEG', quality=80)
+        return base64.b64encode(buf.getvalue()).decode('utf-8'), "image/jpeg"
     except Exception as e:
         logger.warning(f"Error encoding image to base64: {e}")
     return None, "image/jpeg"
 
 def call_gemini_vision(b64_img: str, mime_type: str = "image/jpeg") -> Optional[Dict[str, Any]]:
-    """Calls Gemini API via HTTPS using standard requests / urllib."""
+    """Calls Gemini API via HTTPS using standard requests."""
     api_key = os.environ.get("GEMINI_API_KEY", GEMINI_API_KEY)
     if not api_key:
+        return None
+    api_key = api_key.strip()
+    if not api_key.startswith("AIzaSy"):
         return None
 
     import requests
@@ -130,7 +136,7 @@ def call_gemini_vision(b64_img: str, mime_type: str = "image/jpeg") -> Optional[
     }
 
     try:
-        resp = requests.post(url, json=payload, timeout=8)
+        resp = requests.post(url, json=payload, timeout=3.5)
         if resp.status_code != 200:
             logger.warning(f"Gemini Vision API status {resp.status_code}: {resp.text[:120]}")
             return None
@@ -150,6 +156,9 @@ def call_openai_vision(b64_img: str, mime_type: str = "image/jpeg") -> Optional[
     """Calls OpenAI API (GPT-4o) via HTTPS using standard requests."""
     api_key = os.environ.get("OPENAI_API_KEY", OPENAI_API_KEY)
     if not api_key:
+        return None
+    api_key = api_key.strip()
+    if not api_key.startswith("sk-"):
         return None
 
     import requests
@@ -182,7 +191,7 @@ def call_openai_vision(b64_img: str, mime_type: str = "image/jpeg") -> Optional[
     }
 
     try:
-        resp = requests.post(url, headers=headers, json=payload, timeout=8)
+        resp = requests.post(url, headers=headers, json=payload, timeout=3.5)
         if resp.status_code != 200:
             logger.warning(f"OpenAI Vision API status {resp.status_code}: {resp.text[:120]}")
             return None

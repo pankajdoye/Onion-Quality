@@ -33,6 +33,12 @@ app.add_middleware(
 @app.on_event("startup")
 def startup_event():
     init_db()
+    try:
+        from ml.pipeline_bridge import get_engine
+        get_engine()
+        print("OnionAIEngine pre-warmed and ready.")
+    except Exception as e:
+        print(f"Startup engine warmup note: {e}")
 
 @app.get("/")
 def read_root():

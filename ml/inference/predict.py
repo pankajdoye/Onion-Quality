@@ -170,13 +170,24 @@ class OnionAIEngine:
         return damage, rot, sprouting, crack, discoloration
 
     def predict(self, image_path: str, calibrated_threshold: float = 0.20, run_vision_ai: bool = True):
-        # 1. Safe Image Loading with EXIF Orientation Normalization
+        # 1. Safe Image Loading with EXIF Orientation Normalization & Performance Downscaling
         try:
             with Image.open(image_path) as img:
                 img = ImageOps.exif_transpose(img)
+                w_orig, h_orig = img.size
+                
+                # Cap maximum dimension to 1024px for 50x faster YOLO inference and low RAM usage on Render
+                max_dim = 1024
+                if max(w_orig, h_orig) > max_dim:
+                    scale = max_dim / max(w_orig, h_orig)
+                    new_w = max(1, int(w_orig * scale))
+                    new_h = max(1, int(h_orig * scale))
+                    img = img.resize((new_w, new_h), Image.Resampling.BILINEAR)
+                
                 img_rgb = img.convert('RGB')
                 tensor_img = self.transform(img_rgb).unsqueeze(0).to(self.device)
                 w, h = img_rgb.size
+                cv_img = cv2.cvtColor(np.array(img_rgb), cv2.COLOR_RGB2BGR)
         except Exception:
             return {
                 "status": "rejected",
@@ -197,10 +208,6 @@ class OnionAIEngine:
                 validator_prob = torch.sigmoid(validator_logits).item()
 
         # 4. Stage 2: Multi-Bulb Detection via YOLO
-        cv_img = cv2.imdecode(np.fromfile(str(image_path), dtype=np.uint8), cv2.IMREAD_COLOR)
-        if cv_img is None:
-            cv_img = cv2.cvtColor(np.array(img_rgb), cv2.COLOR_RGB2BGR)
-
         onion_detected_boxes = []
         bulb_candidate_boxes = []
         if self.yolo_model is not None and cv_img is not None:
@@ -285,8 +292,16 @@ class OnionAIEngine:
 
         # Optional Vision AI secondary opinion
         vision_ai_data = None
-        if run_vision_ai and get_vision_second_opinion is not None:
-            vision_ai_data = get_vision_second_opinion(image_path)
+        # Check if Vision AI should be invoked (avoid unnecessary external API latency if local model is highly confident)
+        is_high_conf = (validator_prob >= 0.75 and len(filtered_boxes) > 0 and max([c for c, _, _ in filtered_boxes]) >= 0.50)
+        vision_only_on_disagreement = os.environ.get("VISION_AI_ONLY_ON_DISAGREEMENT", "true").lower() in ("true", "1", "yes")
+        should_call_vision = run_vision_ai and (not is_high_conf or not vision_only_on_disagreement)
+
+        if should_call_vision and get_vision_second_opinion is not None:
+            try:
+                vision_ai_data = get_vision_second_opinion(image_path)
+            except Exception as e:
+                print(f"Vision AI notice: {e}")
 
         for i, (conf, box, cls_name) in enumerate(filtered_boxes):
             # Safe crop coordinate calculation with 4% padding
