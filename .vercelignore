@@ -1,0 +1,15 @@
+# Ignore Python Backend & ML Models on Vercel (Deployed on Render)
+backend/
+ml/
+models/
+requirements.txt
+render.yaml
+oniongrade.db
+*.db
+*.pth
+*.pt
+*.py
+reports/
+Onion Leaves and Bulb Dataset/
+Onion dataset/
+VegQual-main/
